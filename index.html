@@ -1669,7 +1669,24 @@ async function fetchMonthlyPrices(ticker, startUnix, endUnix) {
     }
   } catch(e) {}
 
-  // Strategy 1: Twelve Data API (reliable, CORS-friendly, adjust=all for dividend+split adjusted)
+  // Strategy 0: Backend API (FastAPI + yfinance — most reliable, no CORS, always adjusted)
+  const backendUrl = localStorage.getItem('etf_v2_backend_url') || 'https://grow-etf-model-api.onrender.com';
+  if (backendUrl) {
+    try {
+      const r = await fetch(`${backendUrl}/api/prices/${ticker}`, { signal: AbortSignal.timeout(20000) });
+      if (r.ok) {
+        const parsed = await r.json();
+        parsed.source = 'Backend API (yfinance adjusted)';
+        try { localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: parsed })); } catch(e) {}
+        priceCache[key] = parsed;
+        return parsed;
+      }
+    } catch(e) {
+      console.warn(`Backend API failed for ${ticker}: ${e.message}`);
+    }
+  }
+
+  // Strategy 1: Twelve Data API (fallback, CORS-friendly, adjust=all for dividend+split adjusted)
   const apiKey = localStorage.getItem('etf_v2_td_apikey') || '';
   if (apiKey) {
     try {
@@ -1788,7 +1805,7 @@ async function runBacktest() {
   // Show loading
   statusEl.textContent = '';
   const hasKey = !!(localStorage.getItem('etf_v2_td_apikey') || '').trim();
-  area.innerHTML = `<div class="bt-loading"><div class="bt-spinner"></div><div>Fetching live price data for 10 ETFs...</div><div style="font-size:10px;margin-top:6px;">${hasKey ? 'Source: Twelve Data API (dividend+split adjusted)' : 'Trying CORS proxies (add API key for reliable access)'} · cached data loads instantly</div></div>`;
+  area.innerHTML = `<div class="bt-loading"><div class="bt-spinner"></div><div>Fetching live price data for 10 ETFs...</div><div style="font-size:10px;margin-top:6px;">Source: Backend API + Twelve Data fallback (dividend+split adjusted) · cached data loads instantly</div></div>`;
 
   const startUnix = Math.floor(startDate.getTime() / 1000);
   const endUnix = Math.floor(now.getTime() / 1000);
