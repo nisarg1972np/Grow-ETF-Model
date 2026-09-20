@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://grow-etf-model-api.onrender.com https://api.twelvedata.com https://api.allorigins.win https://corsproxy.io https://query2.finance.yahoo.com; img-src 'self' data:;">
 <title>ETF Intelligence Model v2 · Wealthsimple Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1578,6 +1579,10 @@ function calcInvestNow() {
 // ACTUAL RETURNS — REAL HISTORICAL BACKTEST
 // ══════════════════════════════════════════════════
 const priceCache = {};
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+const ALLOWED_BACKENDS = ['https://grow-etf-model-api.onrender.com','http://localhost:8000'];
 let backtestChart = null;
 
 // ETF inception dates (approx) — skip months before ETF existed
@@ -1670,7 +1675,8 @@ async function fetchMonthlyPrices(ticker, startUnix, endUnix) {
   } catch(e) {}
 
   // Strategy 0: Backend API (FastAPI + yfinance — most reliable, no CORS, always adjusted)
-  const backendUrl = localStorage.getItem('etf_v2_backend_url') || 'https://grow-etf-model-api.onrender.com';
+  const storedBackend = localStorage.getItem('etf_v2_backend_url') || '';
+  const backendUrl = ALLOWED_BACKENDS.includes(storedBackend) ? storedBackend : 'https://grow-etf-model-api.onrender.com';
   if (backendUrl) {
     try {
       const r = await fetch(`${backendUrl}/api/prices/${ticker}`, { signal: AbortSignal.timeout(20000) });
@@ -1971,10 +1977,10 @@ async function runBacktest() {
 
     renderBacktest({ startDate, now, contribMonths, totalCalendarMonths, totalInvested, currentValue, etfResults, snapshots, failed, prices });
     const srcSet = [...new Set(Object.values(prices).map(p => p.source).filter(Boolean))];
-    statusEl.innerHTML = `<span style="color:var(--accent)">Backtest complete · ${Object.keys(prices).length} ETFs loaded via ${srcSet.join(', ') || 'cache'}</span>`;
+    statusEl.innerHTML = `<span style="color:var(--accent)">Backtest complete · ${Object.keys(prices).length} ETFs loaded via ${escapeHtml(srcSet.join(', ') || 'cache')}</span>`;
 
   } catch(e) {
-    area.innerHTML = `<div class="bt-error"><strong>Backtest Error:</strong> ${e.message}</div>`;
+    area.innerHTML = `<div class="bt-error"><strong>Backtest Error:</strong> ${escapeHtml(e.message)}</div>`;
     statusEl.textContent = '';
   }
 }
