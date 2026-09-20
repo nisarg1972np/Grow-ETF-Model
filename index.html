@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ETF Intelligence Model · Wealthsimple Edition</title>
+<title>ETF Intelligence Model v2 · Wealthsimple Edition</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -14,6 +14,7 @@
   --text:#e8f4f0; --text2:#8ab0a0; --text3:#4a7060;
   --growth:#00d4aa; --stability:#0088ff; --asymmetric:#ff6b35; --dividend:#ffd700;
   --red:#ff4455; --green:#00d4aa;
+  --fhsa:#c084fc; --rrsp:#38bdf8; --tfsa:#34d399;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'JetBrains Mono',monospace;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
@@ -118,9 +119,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .pa-detail{font-size:9px;color:var(--text3);line-height:1.7;margin-bottom:12px;}
 .pa-allocs{display:flex;flex-direction:column;gap:5px;}
 .pa-row{display:flex;justify-content:space-between;align-items:center;font-size:10px;}
-.pa-name{}
 .pa-pct{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;}
-.pa-etfs{font-size:9px;color:var(--text3);margin-top:2px;}
 .pa-bar-row{display:flex;flex-direction:column;gap:2px;margin-top:2px;}
 .pa-bar-bg{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
 .pa-bar{height:100%;border-radius:2px;}
@@ -151,44 +150,117 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .voo-callout strong{color:var(--accent4);font-family:'Syne',sans-serif;}
 
 /* SHIFT TABLES */
-.shift-table-wrap { overflow-x:auto; margin-bottom:14px; }
-.shift-table { width:100%; border-collapse:collapse; font-size:11px; }
-.shift-table th { font-family:'Syne',sans-serif; font-size:9px; text-transform:uppercase; letter-spacing:1.5px; color:var(--text3); padding:8px 10px; text-align:left; border-bottom:1px solid var(--border); white-space:nowrap; }
-.shift-table td { padding:10px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
-.shift-table tr:last-child td { border-bottom:none; }
-.shift-row:hover td { background:rgba(255,255,255,.015); }
-
-.sticker { font-family:'Syne',sans-serif; font-weight:800; font-size:13px; display:block; }
-.sticker-sub { font-size:9px; color:var(--text3); margin-top:1px; display:block; }
-
-.action-badge { font-size:9px; padding:3px 7px; border-radius:3px; font-family:'Syne',sans-serif; font-weight:700; letter-spacing:.5px; white-space:nowrap; }
-.exit-badge { background:rgba(255,68,85,.1); border:1px solid rgba(255,68,85,.25); color:var(--red); }
-.trim-badge { background:rgba(255,107,53,.1); border:1px solid rgba(255,107,53,.25); color:var(--accent3); }
-.new-badge  { background:rgba(0,212,170,.1);  border:1px solid rgba(0,212,170,.25);  color:var(--accent); }
-
-.rel-pct { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; }
-.into-row { display:flex; align-items:center; gap:6px; margin-bottom:3px; }
-.into-pct { font-family:'Syne',sans-serif; font-weight:700; font-size:11px; color:var(--accent); }
-.split-detail { font-size:10px; color:var(--text3); line-height:1.6; }
-.why-text { font-size:10px; color:var(--text2); line-height:1.65; max-width:280px; }
+.shift-table-wrap{overflow-x:auto;margin-bottom:14px;}
+.shift-table{width:100%;border-collapse:collapse;font-size:11px;}
+.shift-table th{font-family:'Syne',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+.shift-table td{padding:10px 10px;border-bottom:1px solid var(--border);vertical-align:top;}
+.shift-table tr:last-child td{border-bottom:none;}
+.shift-row:hover td{background:rgba(255,255,255,.015);}
+.sticker{font-family:'Syne',sans-serif;font-weight:800;font-size:13px;display:block;}
+.sticker-sub{font-size:9px;color:var(--text3);margin-top:1px;display:block;}
+.action-badge{font-size:9px;padding:3px 7px;border-radius:3px;font-family:'Syne',sans-serif;font-weight:700;letter-spacing:.5px;white-space:nowrap;}
+.exit-badge{background:rgba(255,68,85,.1);border:1px solid rgba(255,68,85,.25);color:var(--red);}
+.trim-badge{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.25);color:var(--accent3);}
+.new-badge{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);color:var(--accent);}
+.rel-pct{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;}
+.into-row{display:flex;align-items:center;gap:6px;margin-bottom:3px;}
+.into-pct{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;color:var(--accent);}
+.split-detail{font-size:10px;color:var(--text3);line-height:1.6;}
+.why-text{font-size:10px;color:var(--text2);line-height:1.65;max-width:280px;}
 
 /* NET SUMMARY */
-.net-summary { background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:14px; }
-.ns-title { font-family:'Syne',sans-serif; font-weight:700; font-size:11px; color:var(--text); margin-bottom:10px; text-transform:uppercase; letter-spacing:.5px; }
-.ns-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:start; }
-.ns-arrow { font-size:24px; color:var(--text3); padding-top:20px; text-align:center; }
-.ns-col { display:flex; flex-direction:column; gap:4px; }
-.ns-label { font-size:9px; text-transform:uppercase; letter-spacing:1.5px; color:var(--text3); margin-bottom:4px; }
-.ns-item { font-size:11px; color:var(--text2); }
-.ns-total { margin-top:6px; padding-top:6px; border-top:1px solid var(--border); font-family:'Syne',sans-serif; font-weight:700; font-size:11px; }
-.red-col .ns-total, .red { color:var(--red); }
-.green-col .ns-total, .green { color:var(--accent); }
+.net-summary{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px;}
+.ns-title{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;color:var(--text);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;}
+.ns-grid{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:start;}
+.ns-arrow{font-size:24px;color:var(--text3);padding-top:20px;text-align:center;}
+.ns-col{display:flex;flex-direction:column;gap:4px;}
+.ns-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:4px;}
+.ns-item{font-size:11px;color:var(--text2);}
+.ns-total{margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;}
+.red-col .ns-total,.red{color:var(--red);}
+.green-col .ns-total,.green{color:var(--accent);}
 
-@media(max-width:700px){
-  .ns-grid { grid-template-columns:1fr; }
-  .ns-arrow { display:none; }
-  .why-text { max-width:100%; }
-}
+/* ACCOUNT GUIDE */
+.acct-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px;position:relative;overflow:hidden;}
+.acct-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.acct-tfsa::before{background:var(--tfsa);}
+.acct-rrsp::before{background:var(--rrsp);}
+.acct-fhsa::before{background:var(--fhsa);}
+.acct-title{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;margin-bottom:4px;}
+.acct-sub{font-size:10px;color:var(--text3);margin-bottom:12px;}
+.acct-stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2);}
+.acct-stat:last-child{border-bottom:none;}
+.acct-stat-val{font-family:'Syne',sans-serif;font-weight:700;}
+.priority-flow{display:flex;align-items:center;gap:12px;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;flex-wrap:wrap;}
+.priority-step{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 16px;border-radius:6px;min-width:100px;}
+.priority-num{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;}
+.priority-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;font-family:'Syne',sans-serif;font-weight:700;}
+.priority-detail{font-size:8px;color:var(--text3);}
+.priority-arrow{font-size:20px;color:var(--text3);}
+.etf-place-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:10px;}
+.etf-place-table th{font-family:'Syne',sans-serif;font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);}
+.etf-place-table td{padding:8px 10px;border-bottom:1px solid var(--border);color:var(--text2);}
+.etf-place-table tr:last-child td{border-bottom:none;}
+.etf-place-table tr:hover td{background:rgba(255,255,255,.02);}
+.split-bar{height:24px;border-radius:4px;overflow:hidden;display:flex;margin:8px 0;}
+.split-seg{display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Syne',sans-serif;font-weight:700;color:#080c10;transition:width .4s ease;}
+
+/* USD CARD */
+.usd-card{background:rgba(0,136,255,.06);border:1px solid rgba(0,136,255,.2);border-radius:6px;padding:12px;margin-top:12px;}
+.usd-card strong{color:var(--accent2);font-family:'Syne',sans-serif;}
+
+/* INVEST NOW TAB */
+.in-date-row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;}
+.in-field{display:flex;flex-direction:column;gap:4px;}
+.in-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);}
+.in-date{background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;outline:none;width:170px;}
+.in-date:focus{border-color:var(--accent);}
+.in-calc-btn{padding:8px 20px;background:rgba(0,212,170,.12);border:1px solid var(--accent);border-radius:4px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;font-size:11px;cursor:pointer;text-transform:uppercase;letter-spacing:1px;transition:all .2s;}
+.in-calc-btn:hover{background:rgba(0,212,170,.22);}
+.in-result{margin-top:18px;}
+.in-hero{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
+.in-hero-card{flex:1;min-width:140px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center;}
+.in-hero-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:4px;}
+.in-hero-val{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;}
+.in-hero-sub{font-size:9px;color:var(--text3);margin-top:3px;}
+.in-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.in-etf-list{display:flex;flex-direction:column;gap:5px;}
+.in-etf-row{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;}
+.in-etf-tick{font-family:'Syne',sans-serif;font-weight:800;font-size:12px;}
+.in-etf-amt{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--accent);}
+.in-etf-pct{font-size:9px;color:var(--text3);}
+.in-acct-row{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;}
+.in-acct-name{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;}
+.in-acct-amt{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;}
+.in-acct-etfs{font-size:9px;color:var(--text3);margin-top:2px;}
+.in-past-yr15{background:rgba(255,68,85,.06);border:1px solid rgba(255,68,85,.2);border-radius:6px;padding:16px;text-align:center;}
+.in-past-yr15 strong{color:var(--red);font-family:'Syne',sans-serif;}
+
+/* ACTUAL RETURNS / BACKTEST TAB */
+.bt-loading{text-align:center;padding:40px;color:var(--text3);}
+.bt-spinner{display:inline-block;width:28px;height:28px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.bt-error{background:rgba(255,68,85,.06);border:1px solid rgba(255,68,85,.2);border-radius:6px;padding:16px;color:var(--red);font-size:11px;line-height:1.7;}
+.bt-hero{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.bt-hero-card{flex:1;min-width:130px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px;text-align:center;}
+.bt-hero-label{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:4px;}
+.bt-hero-val{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;}
+.bt-hero-sub{font-size:9px;color:var(--text3);margin-top:3px;}
+.bt-etf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:14px;}
+.bt-etf-card{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px;position:relative;overflow:hidden;}
+.bt-etf-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.bt-etf-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.bt-etf-ticker{font-family:'Syne',sans-serif;font-weight:800;font-size:14px;}
+.bt-etf-gain{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;}
+.bt-etf-stat{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);padding:3px 0;}
+.bt-etf-stat-val{color:var(--text2);font-family:'Syne',sans-serif;font-weight:600;}
+.bt-quick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.bt-quick-btn{padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text2);font-family:'Syne',sans-serif;font-weight:700;font-size:10px;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:.5px;}
+.bt-quick-btn:hover{border-color:var(--accent);color:var(--accent);}
+.bt-note{font-size:9px;color:var(--text3);line-height:1.6;margin-top:6px;}
+
+@media(max-width:700px){.bt-etf-grid{grid-template-columns:1fr;}.bt-hero{flex-direction:column;}}
+
 .disclaimer{margin-top:28px;padding:14px;background:rgba(255,68,85,.05);border:1px solid rgba(255,68,85,.15);border-radius:6px;font-size:10px;color:var(--text3);line-height:1.6;}
 .disclaimer strong{color:var(--red);}
 .pos{color:var(--green);}
@@ -198,8 +270,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 ::-webkit-scrollbar-track{background:var(--bg);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
 
-@media(max-width:900px){.model-grid{grid-template-columns:1fr;}.dollar-alloc{grid-template-columns:1fr;}.phase-alloc-grid{grid-template-columns:1fr;}}
-@media(max-width:700px){.g2{grid-template-columns:1fr;}.g4{grid-template-columns:1fr 1fr;}.bear-grid{grid-template-columns:1fr;}}
+@media(max-width:900px){.model-grid{grid-template-columns:1fr;}.dollar-alloc{grid-template-columns:1fr;}.phase-alloc-grid{grid-template-columns:1fr;}.g3{grid-template-columns:1fr;}}
+@media(max-width:700px){.g2{grid-template-columns:1fr;}.g4{grid-template-columns:1fr 1fr;}.bear-grid{grid-template-columns:1fr;}.ns-grid{grid-template-columns:1fr;}.ns-arrow{display:none;}.why-text{max-width:100%;}.priority-flow{flex-direction:column;}.priority-arrow{transform:rotate(90deg);}.in-breakdown{grid-template-columns:1fr;}.in-date-row{flex-direction:column;}.in-date{width:100%;}}
 </style>
 </head>
 <body>
@@ -207,10 +279,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <header>
   <div class="hdr">
     <div>
-      <h1>ETF <span>Intelligence</span> Model</h1>
+      <h1>ETF <span>Intelligence</span> Model <span style="font-size:14px;color:var(--accent2)">v2</span></h1>
       <p>Wealthsimple · Step-Up DCA · Canada Optimized · 60-Year Horizon</p>
     </div>
-    <div class="ws-badge"><div class="live-dot"></div>🍁 WEALTHSIMPLE EDITION</div>
+    <div class="ws-badge"><div class="live-dot"></div>WEALTHSIMPLE EDITION</div>
   </div>
 </header>
 
@@ -220,9 +292,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   <button class="tab" onclick="switchTab('projections',this)">Projections</button>
   <button class="tab" onclick="switchTab('allocation',this)">Phase Allocation</button>
   <button class="tab" onclick="switchTab('strategy',this)">Strategy</button>
+  <button class="tab" onclick="switchTab('accounts',this)">Account Guide</button>
+  <button class="tab" onclick="switchTab('investnow',this)">Invest Now</button>
+  <button class="tab" onclick="switchTab('backtest',this)">Actual Returns</button>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════ MODEL TAB -->
+<!-- ══════════════════════════════════════════════════════ MODEL TAB -->
 <div id="tab-model" class="tab-content active">
   <div class="model-grid">
     <div class="controls-panel">
@@ -237,13 +312,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
           <div class="ctrl-label">Step-Up Rate (every 4 months) <span class="ctrl-val" id="stepup-val">10%</span></div>
           <input type="range" min="0" max="25" step="1" value="10" id="stepup-slider" oninput="debouncedUpdate()">
         </div>
-        <div style="margin-top:8px;" class="stepup-info" id="stepup-info">
-          Loading…
-        </div>
+        <div style="margin-top:8px;" class="stepup-info" id="stepup-info">Loading...</div>
         <div class="divider"></div>
         <div class="ctrl">
-          <div class="ctrl-label">Target Annual Return <span class="ctrl-val" id="return-val">15.0%</span></div>
-          <input type="range" min="11.5" max="22" step="0.5" value="15" id="return-slider" oninput="debouncedUpdate()">
+          <div class="ctrl-label">Target Annual Return <span class="ctrl-val" id="return-val">10.0%</span></div>
+          <input type="range" min="5" max="18" step="0.5" value="10" id="return-slider" oninput="debouncedUpdate()">
         </div>
         <div class="divider"></div>
         <div class="ctrl">
@@ -269,9 +342,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
         <div class="ctrl">
           <div class="ctrl-label">Market Condition</div>
           <div class="sg">
-            <button class="sbtn market-btn" data-m="bear" onclick="setMarket(this)">🐻 Bear</button>
-            <button class="sbtn market-btn active" data-m="neutral" onclick="setMarket(this)">😐 Neutral</button>
-            <button class="sbtn market-btn" data-m="bull" onclick="setMarket(this)">🐂 Bull</button>
+            <button class="sbtn market-btn" data-m="bear" onclick="setMarket(this)">Bear</button>
+            <button class="sbtn market-btn active" data-m="neutral" onclick="setMarket(this)">Neutral</button>
+            <button class="sbtn market-btn" data-m="bull" onclick="setMarket(this)">Bull</button>
           </div>
         </div>
       </div>
@@ -279,10 +352,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       <div class="card">
         <div class="card-label">Dynamic Allocation</div>
         <div class="alloc-grid">
-          <div class="alloc-row"><div class="alloc-hdr"><span style="color:var(--growth)">● Growth</span><span class="alloc-pct" id="al-growth" style="color:var(--growth)">45%</span></div><div class="bar-bg"><div class="bar" id="bar-growth" style="width:45%;background:var(--growth)"></div></div></div>
-          <div class="alloc-row"><div class="alloc-hdr"><span style="color:var(--stability)">● Stability</span><span class="alloc-pct" id="al-stability" style="color:var(--stability)">30%</span></div><div class="bar-bg"><div class="bar" id="bar-stability" style="width:30%;background:var(--stability)"></div></div></div>
-          <div class="alloc-row"><div class="alloc-hdr"><span style="color:var(--asymmetric)">● Asymmetric</span><span class="alloc-pct" id="al-asymmetric" style="color:var(--asymmetric)">15%</span></div><div class="bar-bg"><div class="bar" id="bar-asymmetric" style="width:15%;background:var(--asymmetric)"></div></div></div>
-          <div class="alloc-row"><div class="alloc-hdr"><span style="color:var(--dividend)">● Dividend</span><span class="alloc-pct" id="al-dividend" style="color:var(--dividend)">10%</span></div><div class="bar-bg"><div class="bar" id="bar-dividend" style="width:10%;background:var(--dividend)"></div></div></div>
+          <div class="alloc-row"><div class="alloc-hdr"><span style="color:var(--growth)">Growth</span><span class="alloc-pct" id="al-growth" style="color:var(--growth)">35%</span></div><div class="bar-bg"><div class="bar" id="bar-growth" style="width:35%;background:var(--growth)"></div></div></div>
+          <div class="alloc-row"><div class="alloc-hdr"><span style="color:var(--stability)">Stability</span><span class="alloc-pct" id="al-stability" style="color:var(--stability)">35%</span></div><div class="bar-bg"><div class="bar" id="bar-stability" style="width:35%;background:var(--stability)"></div></div></div>
+          <div class="alloc-row"><div class="alloc-hdr"><span style="color:var(--asymmetric)">Asymmetric</span><span class="alloc-pct" id="al-asymmetric" style="color:var(--asymmetric)">15%</span></div><div class="bar-bg"><div class="bar" id="bar-asymmetric" style="width:15%;background:var(--asymmetric)"></div></div></div>
+          <div class="alloc-row"><div class="alloc-hdr"><span style="color:var(--dividend)">Dividend</span><span class="alloc-pct" id="al-dividend" style="color:var(--dividend)">15%</span></div><div class="bar-bg"><div class="bar" id="bar-dividend" style="width:15%;background:var(--dividend)"></div></div></div>
+        </div>
+      </div>
+
+      <div class="usd-card">
+        <strong>USD Account — $10/mo</strong>
+        <div style="font-size:10px;color:var(--text2);margin-top:6px;line-height:1.6;">
+          All 10 ETFs trade in USD. Wealthsimple USD account eliminates the 1.5% FX spread on every buy/sell. At $500/mo that saves $90/yr. Fee waived automatically at $100K+ assets.
         </div>
       </div>
     </div>
@@ -291,18 +371,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
         <div class="stat"><div class="stat-lbl">Projected Value</div><div class="stat-val pos" id="sv-proj">—</div><div class="stat-sub" id="sv-proj-sub">at target return</div></div>
         <div class="stat"><div class="stat-lbl">Portfolio at Yr 15</div><div class="stat-val" id="sv-at15" style="color:var(--accent2)">—</div><div class="stat-sub" id="sv-at15-sub">lump sum · contributions stop</div></div>
-        <div class="stat"><div class="stat-lbl">Total Invested</div><div class="stat-val" id="sv-inv">—</div><div class="stat-sub" id="sv-inv-sub">yrs 1–15 only</div></div>
+        <div class="stat"><div class="stat-lbl">Total Invested</div><div class="stat-val" id="sv-inv">—</div><div class="stat-sub" id="sv-inv-sub">yrs 1-15 only</div></div>
         <div class="stat"><div class="stat-lbl">Return Multiple</div><div class="stat-val pos" id="sv-mult">—</div><div class="stat-sub" id="sv-mult-sub">total gain</div></div>
-        <div class="stat"><div class="stat-lbl">Monthly Income</div><div class="stat-val" id="sv-income" style="color:var(--dividend)">—</div><div class="stat-sub">4% SWR ÷ 12 at end</div></div>
+        <div class="stat"><div class="stat-lbl">Monthly Income</div><div class="stat-val" id="sv-income" style="color:var(--dividend)">—</div><div class="stat-sub" id="sv-income-sub">SWR / 12 at end</div></div>
       </div>
 
       <div class="card">
-        <div class="card-label">Portfolio Growth · Step-Up DCA (Yrs 1–15 only) vs Flat DCA vs Capital Deployed</div>
+        <div class="card-label">Portfolio Growth · Step-Up DCA (Yrs 1-15 only) vs Flat DCA vs Capital Deployed</div>
         <div class="chart-wrap" style="height:230px;"><canvas id="growthChart"></canvas></div>
       </div>
 
       <div class="card">
-        <div class="card-label">Full 15-Year DCA Schedule · Yearly Milestones · ⟳ = Phase Shift · 🛑 = Stop</div>
+        <div class="card-label">Full 15-Year DCA Schedule · Yearly Milestones</div>
         <div style="overflow-x:auto;"><table class="proj-table" id="stepup-table"></table></div>
       </div>
 
@@ -314,342 +394,493 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ ETF UNIVERSE TAB -->
+<!-- ══════════════════════════════════════════════════ ETF UNIVERSE TAB -->
 <div id="tab-universe" class="tab-content">
   <div class="voo-callout">
-    <strong>💛 VOO Added — Absolutely the Right Call.</strong> VOO (Vanguard S&P 500 ETF) tracks the S&P 500, holds 500 of the largest US companies, and carries a 0.03% expense ratio — identical to VTI. For Wealthsimple users: VOO trades in USD but is purchasable on WS Trade. It's arguably a stronger core hold than VTI because of its concentration in high-quality profitable businesses. Historical 10-yr CAGR ~13.5%. Placed here in the Stability pillar as a ★ Recommended core holding.
+    <strong>v2 Changes:</strong> Dropped BOTZ (0.68% ER, niche), VGT (overlaps QQQ 85%+), and SMH (redundant with SOXX). Added USMV for Phase 3 low-volatility buffer. 10 focused ETFs, lower blended cost, zero redundancy. Return expectations updated to 7% conservative / 10% base / 14% optimistic — backed by Vanguard and Schwab 2026 forward estimates.
   </div>
   <div class="g2">
     <div class="card">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--growth)"></div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--growth);text-transform:uppercase;letter-spacing:1px;">Growth</div><div style="font-size:9px;color:var(--text3);margin-left:auto;">Core Engine</div></div>
       <div class="etf-list">
-        <div class="etf-row"><div class="etf-tick">QQQ</div><div class="etf-nm">Invesco Nasdaq 100<span>Top 100 non-fin Nasdaq · mega-cap tech</span></div><div class="etf-er">0.20%</div><div class="cb">CORE</div></div>
-        <div class="etf-row"><div class="etf-tick">VGT</div><div class="etf-nm">Vanguard Info Tech<span>Broad tech sector · 350+ holdings</span></div><div class="etf-er">0.10%</div><div class="cb">CORE</div></div>
-        <div class="etf-row"><div class="etf-tick">SCHG</div><div class="etf-nm">Schwab US Large Growth<span>US large-cap growth blend</span></div><div class="etf-er">0.04%</div><div class="cb">CORE</div></div>
+        <div class="etf-row"><div class="etf-tick">QQQ</div><div class="etf-nm">Invesco Nasdaq 100<span>Top 100 non-fin Nasdaq · mega-cap tech · 18.4% 10yr CAGR</span></div><div class="etf-er">0.20%</div><div class="cb">CORE</div></div>
+        <div class="etf-row"><div class="etf-tick">SCHG</div><div class="etf-nm">Schwab US Large Growth<span>US large-cap growth · 0.04% ER · 17.2% 10yr CAGR</span></div><div class="etf-er">0.04%</div><div class="cb">CORE</div></div>
       </div>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--stability)"></div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--stability);text-transform:uppercase;letter-spacing:1px;">Stability</div><div style="font-size:9px;color:var(--text3);margin-left:auto;">Foundation Layer</div></div>
       <div class="etf-list">
-        <div class="etf-row"><div class="etf-tick" style="color:var(--accent4)">VOO</div><div class="etf-nm">Vanguard S&P 500<span>★ Recommended · 500 large-cap US · 13.5% hist. CAGR</span></div><div class="etf-er">0.03%</div><div class="voo-badge">★ NEW</div></div>
+        <div class="etf-row"><div class="etf-tick" style="color:var(--accent4)">VOO</div><div class="etf-nm">Vanguard S&P 500<span>500 large-cap US · 0.03% ER · 13.5% 10yr CAGR</span></div><div class="etf-er">0.03%</div><div class="voo-badge">ANCHOR</div></div>
         <div class="etf-row"><div class="etf-tick">VTI</div><div class="etf-nm">Vanguard Total Market<span>~4,000 US stocks · broadest diversification</span></div><div class="etf-er">0.03%</div><div class="cb">CORE</div></div>
-        <div class="etf-row"><div class="etf-tick">USMV</div><div class="etf-nm">iShares Min Volatility<span>Low-vol factor · bear market buffer</span></div><div class="etf-er">0.15%</div><div class="cb">CORE</div></div>
-        <div class="etf-row"><div class="etf-tick">VEA</div><div class="etf-nm">Vanguard Developed Mkts<span>International diversification · Europe/Asia</span></div><div class="etf-er">0.05%</div><div></div></div>
+        <div class="etf-row"><div class="etf-tick">VEA</div><div class="etf-nm">Vanguard Developed Mkts<span>International · Europe/Japan/Australia · geo hedge</span></div><div class="etf-er">0.05%</div><div></div></div>
+        <div class="etf-row"><div class="etf-tick">USMV</div><div class="etf-nm">iShares Min Volatility<span>Low-vol factor · Phase 3 only · bear market buffer</span></div><div class="etf-er">0.15%</div><div style="font-size:8px;padding:2px 5px;background:rgba(0,136,255,.1);border:1px solid rgba(0,136,255,.2);color:var(--accent2);border-radius:3px;text-transform:uppercase;letter-spacing:1px;">PH3</div></div>
       </div>
     </div>
     <div class="card">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--asymmetric)"></div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--asymmetric);text-transform:uppercase;letter-spacing:1px;">Asymmetric Bets</div><div style="font-size:9px;color:var(--text3);margin-left:auto;">AI/Semis Supercycle</div></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--asymmetric)"></div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--asymmetric);text-transform:uppercase;letter-spacing:1px;">Asymmetric</div><div style="font-size:9px;color:var(--text3);margin-left:auto;">AI/Semis Supercycle</div></div>
       <div class="etf-list">
-        <div class="etf-row"><div class="etf-tick">SOXX</div><div class="etf-nm">iShares Semiconductor<span>30 top semis · NVDA TSMC ASML</span></div><div class="etf-er">0.35%</div><div class="bb">BET</div></div>
-        <div class="etf-row"><div class="etf-tick">SMH</div><div class="etf-nm">VanEck Semiconductor<span>25 semis · NVDA-concentrated</span></div><div class="etf-er">0.35%</div><div class="bb">BET</div></div>
-        <div class="etf-row"><div class="etf-tick">BOTZ</div><div class="etf-nm">Global X Robotics & AI<span>Pure-play AI · robotics · automation</span></div><div class="etf-er">0.68%</div><div class="bb">BET</div></div>
+        <div class="etf-row"><div class="etf-tick">SOXX</div><div class="etf-nm">iShares Semiconductor<span>30 top semis · NVDA TSMC ASML · 24.1% 10yr CAGR</span></div><div class="etf-er">0.35%</div><div class="bb">BET</div></div>
       </div>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><div style="width:8px;height:8px;border-radius:50%;background:var(--dividend)"></div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--dividend);text-transform:uppercase;letter-spacing:1px;">Dividend Income</div><div style="font-size:9px;color:var(--text3);margin-left:auto;">Cash Flow Layer</div></div>
       <div class="etf-list">
-        <div class="etf-row"><div class="etf-tick">SCHD</div><div class="etf-nm">Schwab US Dividend<span>Quality dividends · 3.5%+ yield</span></div><div class="etf-er">0.06%</div><div class="cb">CORE</div></div>
-        <div class="etf-row"><div class="etf-tick">VYM</div><div class="etf-nm">Vanguard High Dividend<span>400+ high-yield US stocks</span></div><div class="etf-er">0.06%</div><div class="cb">CORE</div></div>
-        <div class="etf-row"><div class="etf-tick">JEPI</div><div class="etf-nm">JPMorgan Equity Premium<span>Covered call strategy · 6–8% yield</span></div><div class="etf-er">0.35%</div><div></div></div>
+        <div class="etf-row"><div class="etf-tick">SCHD</div><div class="etf-nm">Schwab US Dividend<span>Quality dividends · 3.5%+ yield · 11.3% 10yr total return</span></div><div class="etf-er">0.06%</div><div class="cb">CORE</div></div>
+        <div class="etf-row"><div class="etf-tick">VYM</div><div class="etf-nm">Vanguard High Dividend<span>400+ high-yield US stocks · 2.8% yield</span></div><div class="etf-er">0.06%</div><div class="cb">CORE</div></div>
+        <div class="etf-row"><div class="etf-tick">JEPI</div><div class="etf-nm">JPMorgan Equity Premium<span>Covered call · 7-8% yield · Phase 3 income engine</span></div><div class="etf-er">0.35%</div><div style="font-size:8px;padding:2px 5px;background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);color:var(--accent4);border-radius:3px;text-transform:uppercase;letter-spacing:1px;">PH3</div></div>
       </div>
     </div>
   </div>
   <div style="margin-top:14px;" class="card">
     <div class="card-label">Wealthsimple Availability & Cost</div>
     <div style="display:flex;gap:28px;flex-wrap:wrap;margin-top:8px;">
-      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">All ETFs Available on WS</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--accent);">✓ Commission-Free</div><div style="font-size:9px;color:var(--text3);">Wealthsimple Trade charges $0 per ETF buy</div></div>
-      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Blended ER (Balanced)</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--accent);">~0.13%</div><div style="font-size:9px;color:var(--text3);">per year on $100K = $130</div></div>
-      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">FX Note</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--accent2);">1.5% spread</div><div style="font-size:9px;color:var(--text3);">WS Premium ($10/mo) eliminates FX fee</div></div>
+      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">All 10 ETFs on WS</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--accent);">Commission-Free</div><div style="font-size:9px;color:var(--text3);">$0 per ETF buy on WS Trade</div></div>
+      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">Blended ER (Balanced)</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--accent);">~0.10%</div><div style="font-size:9px;color:var(--text3);">per year on $100K = $100</div></div>
+      <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">USD Account</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--accent2);">$10/mo</div><div style="font-size:9px;color:var(--text3);">eliminates 1.5% FX spread · waived at $100K+</div></div>
       <div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;">30-Year Cost Savings vs MF</div><div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--accent4);">$80K+</div><div style="font-size:9px;color:var(--text3);">kept in your portfolio via low ERs</div></div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ PROJECTIONS TAB -->
+<!-- ══════════════════════════════════════════════════ PROJECTIONS TAB -->
 <div id="tab-projections" class="tab-content">
   <div class="card" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
       <div class="card-label" style="margin-bottom:0;">All Scenarios · Start: <span id="proj-dca" style="color:var(--accent)">$500</span> · Step-Up: <span id="proj-stepup" style="color:var(--accent2)">10%</span> every 4 months</div>
       <div style="display:flex;gap:14px;font-size:10px;flex-wrap:wrap;">
-        <span class="sl">■ Conservative 11.5%</span>
-        <span class="sb">■ Base 15%</span>
-        <span class="sh">■ Optimistic 20%</span>
+        <span class="sl">Conservative 7%</span>
+        <span class="sb">Base 10%</span>
+        <span class="sh">Optimistic 14%</span>
       </div>
     </div>
     <div style="overflow-x:auto;"><table class="proj-table" id="proj-table"></table></div>
   </div>
   <div class="card">
-    <div class="card-label">Wealth Accumulation · Step-Up vs Flat DCA (Base 15%)</div>
+    <div class="card-label">Wealth Accumulation · Step-Up vs Flat DCA (Base 10%)</div>
     <div class="chart-wrap" style="height:280px;"><canvas id="projChart"></canvas></div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════ PHASE ALLOCATION TAB -->
+<!-- ══════════════════════════════════════════════════ PHASE ALLOCATION TAB -->
 <div id="tab-allocation" class="tab-content">
 
-  <!-- ── Phase overview strip ── -->
   <div class="phase-alloc-grid" style="margin-bottom:14px;">
+    <!-- PHASE 1: Accumulation Yrs 1-10 -->
     <div class="pa">
       <div class="pa-num">01</div>
       <div class="pa-title">Accumulation</div>
-      <div class="pa-years">Years 1–10</div>
-      <div class="pa-detail">Maximum growth. Step-up DCA every 4 months. Reinvest every dividend. Volatility is fuel — more shares per dollar. No selling, no rebalancing until Year 10.</div>
+      <div class="pa-years">Years 1-10</div>
+      <div class="pa-detail">Maximum growth. Step-up DCA every 4 months. Reinvest every dividend. Volatility is fuel. No selling until Year 10.</div>
       <div class="pa-allocs">
         <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--growth)">QQQ</span><span class="pa-pct" style="color:var(--growth)">25%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:25%;background:var(--growth)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--accent4)">VOO</span><span class="pa-pct" style="color:var(--accent4)">20%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:20%;background:var(--accent4)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--growth)">VGT</span><span class="pa-pct" style="color:var(--growth)">15%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:15%;background:var(--growth)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">VTI</span><span class="pa-pct" style="color:var(--stability)">15%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:15%;background:var(--stability)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--asymmetric)">SOXX</span><span class="pa-pct" style="color:var(--asymmetric)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--asymmetric)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--asymmetric)">BOTZ</span><span class="pa-pct" style="color:var(--asymmetric)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--asymmetric)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">SCHD</span><span class="pa-pct" style="color:var(--dividend)">5%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:5%;background:var(--dividend)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--accent4)">VOO</span><span class="pa-pct" style="color:var(--accent4)">25%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:25%;background:var(--accent4)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--asymmetric)">SOXX</span><span class="pa-pct" style="color:var(--asymmetric)">15%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:15%;background:var(--asymmetric)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--growth)">SCHG</span><span class="pa-pct" style="color:var(--growth)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--growth)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">VTI</span><span class="pa-pct" style="color:var(--stability)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--stability)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">SCHD</span><span class="pa-pct" style="color:var(--dividend)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--dividend)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">VEA</span><span class="pa-pct" style="color:var(--stability)">5%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:5%;background:var(--stability)"></div></div></div>
       </div>
     </div>
+    <!-- PHASE 2: Compounding Yrs 10-20 -->
     <div class="pa">
       <div class="pa-num">02</div>
       <div class="pa-title">Compounding</div>
-      <div class="pa-years">Years 10–20</div>
-      <div class="pa-detail">Protect the base. Shift speculative bets into quality. Step-up DCA continues to Year 15, then stops. Compounding does the heavy lifting.</div>
+      <div class="pa-years">Years 10-20</div>
+      <div class="pa-detail">Protect the base. Shift speculative into quality. DCA continues to Yr 15, then stops. Compounding does the heavy lifting.</div>
       <div class="pa-allocs">
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--accent4)">VOO</span><span class="pa-pct" style="color:var(--accent4)">22%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:22%;background:var(--accent4)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--growth)">QQQ</span><span class="pa-pct" style="color:var(--growth)">20%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:20%;background:var(--growth)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">VTI</span><span class="pa-pct" style="color:var(--stability)">18%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:18%;background:var(--stability)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">SCHD</span><span class="pa-pct" style="color:var(--dividend)">15%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:15%;background:var(--dividend)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--growth)">VGT</span><span class="pa-pct" style="color:var(--growth)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--growth)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--asymmetric)">SOXX</span><span class="pa-pct" style="color:var(--asymmetric)">8%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:8%;background:var(--asymmetric)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">VYM</span><span class="pa-pct" style="color:var(--dividend)">7%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:7%;background:var(--dividend)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--accent4)">VOO</span><span class="pa-pct" style="color:var(--accent4)">28%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:28%;background:var(--accent4)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">SCHD</span><span class="pa-pct" style="color:var(--dividend)">18%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:18%;background:var(--dividend)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--growth)">QQQ</span><span class="pa-pct" style="color:var(--growth)">17%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:17%;background:var(--growth)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">VYM</span><span class="pa-pct" style="color:var(--dividend)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--dividend)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">VTI</span><span class="pa-pct" style="color:var(--stability)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--stability)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--growth)">SCHG</span><span class="pa-pct" style="color:var(--growth)">7%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:7%;background:var(--growth)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--asymmetric)">SOXX</span><span class="pa-pct" style="color:var(--asymmetric)">5%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:5%;background:var(--asymmetric)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">VEA</span><span class="pa-pct" style="color:var(--stability)">5%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:5%;background:var(--stability)"></div></div></div>
       </div>
     </div>
+    <!-- PHASE 3: Harvest Yrs 20+ -->
     <div class="pa">
       <div class="pa-num">03</div>
       <div class="pa-title">Harvest</div>
       <div class="pa-years">Years 20+</div>
-      <div class="pa-detail">Zero new contributions. Income-tilted rebalance. 4% SWR withdrawal begins. Keep 30% growth to outrun inflation. TFSA withdrawal sequence matters.</div>
+      <div class="pa-detail">Zero contributions. Income-tilted rebalance. SWR withdrawal begins. Keep ~33% growth to outrun inflation. TFSA withdrawal sequence matters.</div>
       <div class="pa-allocs">
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--accent4)">VOO</span><span class="pa-pct" style="color:var(--accent4)">20%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:20%;background:var(--accent4)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">SCHD</span><span class="pa-pct" style="color:var(--dividend)">20%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:20%;background:var(--dividend)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">JEPI</span><span class="pa-pct" style="color:var(--dividend)">15%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:15%;background:var(--dividend)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">VTI</span><span class="pa-pct" style="color:var(--stability)">15%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:15%;background:var(--stability)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">VYM</span><span class="pa-pct" style="color:var(--dividend)">15%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:15%;background:var(--dividend)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--growth)">QQQ</span><span class="pa-pct" style="color:var(--growth)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--growth)"></div></div></div>
-        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--asymmetric)">SOXX</span><span class="pa-pct" style="color:var(--asymmetric)">5%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:5%;background:var(--asymmetric)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--accent4)">VOO</span><span class="pa-pct" style="color:var(--accent4)">25%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:25%;background:var(--accent4)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">SCHD</span><span class="pa-pct" style="color:var(--dividend)">22%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:22%;background:var(--dividend)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">JEPI</span><span class="pa-pct" style="color:var(--dividend)">13%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:13%;background:var(--dividend)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--dividend)">VYM</span><span class="pa-pct" style="color:var(--dividend)">12%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:12%;background:var(--dividend)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">VTI</span><span class="pa-pct" style="color:var(--stability)">10%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:10%;background:var(--stability)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--growth)">QQQ</span><span class="pa-pct" style="color:var(--growth)">8%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:8%;background:var(--growth)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">VEA</span><span class="pa-pct" style="color:var(--stability)">5%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:5%;background:var(--stability)"></div></div></div>
+        <div class="pa-bar-row"><div class="pa-row"><span style="color:var(--stability)">USMV</span><span class="pa-pct" style="color:var(--stability)">5%</span></div><div class="pa-bar-bg"><div class="pa-bar" style="width:5%;background:var(--stability)"></div></div></div>
       </div>
     </div>
   </div>
 
-  <!-- ── SHIFT 1: Accumulation → Compounding ── -->
+  <!-- SHIFT 01: Accumulation -> Compounding -->
   <div class="card" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:4px;padding:4px 10px;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:var(--accent3);">SHIFT 01</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;">Accumulation → Compounding</div>
-      <div style="margin-left:auto;font-size:10px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 10px;">📅 Execute at Year 10 · January rebalance</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;">Accumulation -> Compounding</div>
+      <div style="margin-left:auto;font-size:10px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 10px;">Execute at Year 10 · January rebalance</div>
     </div>
 
     <div style="font-size:11px;color:var(--text2);margin-bottom:14px;line-height:1.7;padding:10px 12px;background:var(--surface2);border-radius:6px;border-left:3px solid var(--accent3);">
-      <strong style="color:var(--text);">The Goal:</strong> You've had 10 years of aggressive growth. Now the portfolio is large enough that <em>protecting it matters more than chasing returns</em>. BOTZ has served its purpose as an asymmetric bet — sell it entirely and rotate into quality. Trim VGT gains into income. Slightly reduce SOXX exposure. The freed capital moves into VOO, SCHD, VYM — assets that pay you and grow more predictably.
+      <strong style="color:var(--text);">The Goal:</strong> 10 years of aggressive growth built a meaningful base. Now <em>protecting capital matters more than chasing returns</em>. Trim SOXX from 15% to 5%, cut QQQ from 25% to 17%, reduce SCHG from 10% to 7%. The freed 21% flows into VOO (+3%), SCHD (+8%), and introduces VYM at 10%.
     </div>
 
     <div class="shift-table-wrap">
       <table class="shift-table">
-        <thead>
-          <tr>
-            <th>ETF Exiting / Trimming</th>
-            <th>Action</th>
-            <th>% Released</th>
-            <th>→ Goes Into</th>
-            <th>Split</th>
-            <th>Why</th>
-          </tr>
-        </thead>
+        <thead><tr><th>ETF</th><th>Action</th><th>% Released</th><th>Goes Into</th><th>Split</th><th>Why</th></tr></thead>
         <tbody>
-          <tr class="shift-row exit">
-            <td><span class="sticker" style="color:var(--asymmetric)">BOTZ</span><span class="sticker-sub">10% → 0%</span></td>
-            <td><span class="action-badge exit-badge">FULL EXIT</span></td>
-            <td class="rel-pct" style="color:var(--red)">−10%</td>
-            <td>
-              <div class="into-row"><span class="sticker" style="color:var(--accent4)">VOO</span><span class="into-pct">+7%</span></div>
-              <div class="into-row"><span class="sticker" style="color:var(--dividend)">VYM</span><span class="into-pct">+3%</span></div>
-            </td>
-            <td class="split-detail">70% → VOO<br>30% → VYM</td>
-            <td class="why-text">BOTZ is pure speculation — AI theme has played out enough in 10 yrs. Lock the gains into S&P 500 quality (VOO) and start building dividend income (VYM). Don't gamble winnings.</td>
+          <tr class="shift-row trim">
+            <td><span class="sticker" style="color:var(--asymmetric)">SOXX</span><span class="sticker-sub">15% -> 5%</span></td>
+            <td><span class="action-badge trim-badge">TRIM -10%</span></td>
+            <td class="rel-pct" style="color:var(--accent3)">-10%</td>
+            <td><div class="into-row"><span class="sticker" style="color:var(--dividend)">VYM</span><span class="into-pct">+10%</span></div></td>
+            <td class="split-detail">100% -> VYM (new)</td>
+            <td class="why-text">Semis are cyclical — 15% concentration is too much risk mid-journey. Lock gains into VYM for dividend income that compounds for 10 more years before you need it.</td>
           </tr>
           <tr class="shift-row trim">
-            <td><span class="sticker" style="color:var(--growth)">VGT</span><span class="sticker-sub">15% → 10%</span></td>
-            <td><span class="action-badge trim-badge">TRIM −5%</span></td>
-            <td class="rel-pct" style="color:var(--accent3)">−5%</td>
-            <td>
-              <div class="into-row"><span class="sticker" style="color:var(--dividend)">SCHD</span><span class="into-pct">+5%</span></div>
-            </td>
-            <td class="split-detail">100% → SCHD</td>
-            <td class="why-text">VGT has grown significantly. Harvest 5% of those tech gains and rotate into SCHD — high-quality dividend grower. You keep 10% in VGT for continued tech upside, just reduced.</td>
+            <td><span class="sticker" style="color:var(--growth)">QQQ</span><span class="sticker-sub">25% -> 17%</span></td>
+            <td><span class="action-badge trim-badge">TRIM -8%</span></td>
+            <td class="rel-pct" style="color:var(--accent3)">-8%</td>
+            <td><div class="into-row"><span class="sticker" style="color:var(--dividend)">SCHD</span><span class="into-pct">+8%</span></div></td>
+            <td class="split-detail">100% -> SCHD</td>
+            <td class="why-text">QQQ has compounded aggressively for 10 years. Harvest 8% of gains into SCHD dividend growth — same quality companies, income focus.</td>
           </tr>
           <tr class="shift-row trim">
-            <td><span class="sticker" style="color:var(--asymmetric)">SOXX</span><span class="sticker-sub">10% → 8%</span></td>
-            <td><span class="action-badge trim-badge">TRIM −2%</span></td>
-            <td class="rel-pct" style="color:var(--accent3)">−2%</td>
-            <td>
-              <div class="into-row"><span class="sticker" style="color:var(--stability)">VTI</span><span class="into-pct">+2%</span></div>
-            </td>
-            <td class="split-detail">100% → VTI</td>
-            <td class="why-text">Semiconductor concentration is still valuable but 10% is heavy for mid-journey. Trim 2% into VTI to broaden the base. You keep meaningful SOXX upside at 8%.</td>
-          </tr>
-          <tr class="shift-row new-entry">
-            <td><span class="sticker" style="color:var(--dividend)">VYM</span><span class="sticker-sub">0% → 7%</span></td>
-            <td><span class="action-badge new-badge">NEW ENTRY</span></td>
-            <td class="rel-pct" style="color:var(--accent)">+7%</td>
-            <td><span style="color:var(--text3);font-size:10px;">Funded by BOTZ exit (3%) + organic rebalance drift (4%)</span></td>
-            <td class="split-detail">From BOTZ proceeds</td>
-            <td class="why-text">Begin building the dividend income layer you'll live off in Harvest. VYM is 400+ high-yield stocks. Start it at Year 10 so it compounds for another 10 years before you need it.</td>
+            <td><span class="sticker" style="color:var(--growth)">SCHG</span><span class="sticker-sub">10% -> 7%</span></td>
+            <td><span class="action-badge trim-badge">TRIM -3%</span></td>
+            <td class="rel-pct" style="color:var(--accent3)">-3%</td>
+            <td><div class="into-row"><span class="sticker" style="color:var(--accent4)">VOO</span><span class="into-pct">+3%</span></div></td>
+            <td class="split-detail">100% -> VOO</td>
+            <td class="why-text">SCHG overlaps QQQ significantly. Trim into VOO — broader S&P 500 stability with lower volatility profile.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <div class="net-summary">
-      <div class="ns-title">Net Shift Summary · Accumulation → Compounding</div>
+      <div class="ns-title">Net Shift Summary · Accumulation -> Compounding</div>
       <div class="ns-grid">
-        <div class="ns-col red-col"><div class="ns-label">Selling / Trimming</div><div class="ns-item"><span style="color:var(--asymmetric)">BOTZ</span> fully exits (−10%)</div><div class="ns-item"><span style="color:var(--growth)">VGT</span> trims (−5%)</div><div class="ns-item"><span style="color:var(--asymmetric)">SOXX</span> trims (−2%)</div><div class="ns-total red">−17% of portfolio redeployed</div></div>
-        <div class="ns-arrow">→</div>
-        <div class="ns-col green-col"><div class="ns-label">Buying / Adding</div><div class="ns-item"><span style="color:var(--accent4)">VOO</span> gains +7%</div><div class="ns-item"><span style="color:var(--dividend)">SCHD</span> gains +5%</div><div class="ns-item"><span style="color:var(--dividend)">VYM</span> enters +7% (new)</div><div class="ns-item"><span style="color:var(--stability)">VTI</span> gains +2%</div><div class="ns-total green">+21% into quality &amp; income</div></div>
+        <div class="ns-col red-col"><div class="ns-label">Selling / Trimming</div><div class="ns-item"><span style="color:var(--asymmetric)">SOXX</span> trims (-10%)</div><div class="ns-item"><span style="color:var(--growth)">QQQ</span> trims (-8%)</div><div class="ns-item"><span style="color:var(--growth)">SCHG</span> trims (-3%)</div><div class="ns-total red">-21% of portfolio redeployed</div></div>
+        <div class="ns-arrow">-></div>
+        <div class="ns-col green-col"><div class="ns-label">Buying / Adding</div><div class="ns-item"><span style="color:var(--dividend)">VYM</span> enters +10% (new)</div><div class="ns-item"><span style="color:var(--dividend)">SCHD</span> gains +8%</div><div class="ns-item"><span style="color:var(--accent4)">VOO</span> gains +3%</div><div class="ns-total green">+21% into quality &amp; income</div></div>
       </div>
-      <div style="font-size:10px;color:var(--text3);margin-top:8px;">⚠️ Execute this rebalance inside your TFSA/RRSP — zero capital gains tax. Do it in one session in January of Year 10.</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px;">Execute inside TFSA/RRSP — zero capital gains tax. One session in January of Year 10.</div>
     </div>
   </div>
 
-  <!-- ── SHIFT 2: Compounding → Harvest ── -->
+  <!-- SHIFT 02: Compounding -> Harvest -->
   <div class="card" style="margin-bottom:14px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <div style="background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);border-radius:4px;padding:4px 10px;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:var(--accent4);">SHIFT 02</div>
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;">Compounding → Harvest</div>
-      <div style="margin-left:auto;font-size:10px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 10px;">📅 Execute at Year 20 · January rebalance</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;">Compounding -> Harvest</div>
+      <div style="margin-left:auto;font-size:10px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:4px 10px;">Execute at Year 20 · January rebalance</div>
     </div>
 
     <div style="font-size:11px;color:var(--text2);margin-bottom:14px;line-height:1.7;padding:10px 12px;background:var(--surface2);border-radius:6px;border-left:3px solid var(--accent4);">
-      <strong style="color:var(--text);">The Goal:</strong> Contributions stopped at Year 15. The portfolio has been compounding for 5 years untouched. Now at Year 20 you prepare for withdrawal. The shift is <em>from growth-oriented to income-generating</em>. QQQ gets heavily trimmed — it's done its job. VGT exits entirely. SOXX reduces further. The proceeds build out JEPI (covered calls, monthly income), VYM, and SCHD. You keep VOO and QQQ for inflation-fighting growth. 4% SWR withdrawals begin.
+      <strong style="color:var(--text);">The Goal:</strong> Contributions stopped at Year 15. Portfolio has compounded 5 years untouched. Now prepare for withdrawal. Shift <em>from growth to income</em>. QQQ trims 9%, SCHG exits 7%, SOXX exits 5%, VOO trims 3%. The freed 24% builds JEPI (13%, new) and USMV (5%, new), plus tops up SCHD (+4%) and VYM (+2%).
     </div>
 
     <div class="shift-table-wrap">
       <table class="shift-table">
-        <thead>
-          <tr>
-            <th>ETF Exiting / Trimming</th>
-            <th>Action</th>
-            <th>% Released</th>
-            <th>→ Goes Into</th>
-            <th>Split</th>
-            <th>Why</th>
-          </tr>
-        </thead>
+        <thead><tr><th>ETF</th><th>Action</th><th>% Released</th><th>Goes Into</th><th>Split</th><th>Why</th></tr></thead>
         <tbody>
+          <tr class="shift-row trim">
+            <td><span class="sticker" style="color:var(--growth)">QQQ</span><span class="sticker-sub">17% -> 8%</span></td>
+            <td><span class="action-badge trim-badge">TRIM -9%</span></td>
+            <td class="rel-pct" style="color:var(--accent3)">-9%</td>
+            <td><div class="into-row"><span class="sticker" style="color:var(--dividend)">JEPI</span><span class="into-pct">+9%</span></div></td>
+            <td class="split-detail">100% -> JEPI (new)</td>
+            <td class="why-text">QQQ stays at 8% for inflation hedging. The 9% trim funds JEPI's covered call income — 7-8% annual yield paid monthly.</td>
+          </tr>
           <tr class="shift-row exit">
-            <td><span class="sticker" style="color:var(--growth)">VGT</span><span class="sticker-sub">10% → 0%</span></td>
+            <td><span class="sticker" style="color:var(--growth)">SCHG</span><span class="sticker-sub">7% -> 0%</span></td>
             <td><span class="action-badge exit-badge">FULL EXIT</span></td>
-            <td class="rel-pct" style="color:var(--red)">−10%</td>
-            <td>
-              <div class="into-row"><span class="sticker" style="color:var(--dividend)">JEPI</span><span class="into-pct">+5%</span></div>
-              <div class="into-row"><span class="sticker" style="color:var(--dividend)">SCHD</span><span class="into-pct">+5%</span></div>
-            </td>
-            <td class="split-detail">50% → JEPI<br>50% → SCHD</td>
-            <td class="why-text">VGT has tripled its job — you've held it for 20 years. At harvest, you don't need pure tech growth, you need income. JEPI gives 6–8% monthly covered-call yield. SCHD gives dividend growth. Together they replace VGT's role perfectly.</td>
+            <td class="rel-pct" style="color:var(--red)">-7%</td>
+            <td><div class="into-row"><span class="sticker" style="color:var(--dividend)">SCHD</span><span class="into-pct">+4%</span></div><div class="into-row"><span class="sticker" style="color:var(--dividend)">JEPI</span><span class="into-pct">+3%</span></div></td>
+            <td class="split-detail">57% -> SCHD<br>43% -> JEPI</td>
+            <td class="why-text">Growth mandate served for 20 years. Replace with dividend growth (SCHD) and income (JEPI). VOO + QQQ provide sufficient growth exposure.</td>
+          </tr>
+          <tr class="shift-row exit">
+            <td><span class="sticker" style="color:var(--asymmetric)">SOXX</span><span class="sticker-sub">5% -> 0%</span></td>
+            <td><span class="action-badge exit-badge">FULL EXIT</span></td>
+            <td class="rel-pct" style="color:var(--red)">-5%</td>
+            <td><div class="into-row"><span class="sticker" style="color:var(--stability)">USMV</span><span class="into-pct">+5%</span></div></td>
+            <td class="split-detail">100% -> USMV (new)</td>
+            <td class="why-text">Semis have served their purpose over 20 years. Replace with USMV low-volatility for withdrawal stability — smooths out sequence-of-returns risk.</td>
           </tr>
           <tr class="shift-row trim">
-            <td><span class="sticker" style="color:var(--growth)">QQQ</span><span class="sticker-sub">20% → 10%</span></td>
-            <td><span class="action-badge trim-badge">TRIM −10%</span></td>
-            <td class="rel-pct" style="color:var(--accent3)">−10%</td>
-            <td>
-              <div class="into-row"><span class="sticker" style="color:var(--dividend)">JEPI</span><span class="into-pct">+5%</span></div>
-              <div class="into-row"><span class="sticker" style="color:var(--accent4)">VOO</span><span class="into-pct">+3%</span></div>
-              <div class="into-row"><span class="sticker" style="color:var(--dividend)">VYM</span><span class="into-pct">+2%</span></div>
-            </td>
-            <td class="split-detail">50% → JEPI<br>30% → VOO<br>20% → VYM</td>
-            <td class="why-text">QQQ stays at 10% — you never fully leave Nasdaq because it hedges inflation. But cutting it in half frees 10%. The proceeds go 50% to JEPI income, 30% upgrade to VOO (more stable than QQQ), and 20% to VYM dividend yield.</td>
-          </tr>
-          <tr class="shift-row trim">
-            <td><span class="sticker" style="color:var(--asymmetric)">SOXX</span><span class="sticker-sub">8% → 5%</span></td>
-            <td><span class="action-badge trim-badge">TRIM −3%</span></td>
-            <td class="rel-pct" style="color:var(--accent3)">−3%</td>
-            <td>
-              <div class="into-row"><span class="sticker" style="color:var(--dividend)">VYM</span><span class="into-pct">+3%</span></div>
-            </td>
-            <td class="split-detail">100% → VYM</td>
-            <td class="why-text">SOXX at 5% is the last asymmetric bet — you keep it because semiconductors underpin AI, cloud, and every future technology. But 8% is too much risk when you're withdrawing. The 3% trim goes straight to VYM for yield.</td>
-          </tr>
-          <tr class="shift-row trim">
-            <td><span class="sticker" style="color:var(--stability)">VTI</span><span class="sticker-sub">18% → 15%</span></td>
-            <td><span class="action-badge trim-badge">TRIM −3%</span></td>
-            <td class="rel-pct" style="color:var(--accent3)">−3%</td>
-            <td>
-              <div class="into-row"><span class="sticker" style="color:var(--dividend)">VYM</span><span class="into-pct">+3%</span></div>
-            </td>
-            <td class="split-detail">100% → VYM</td>
-            <td class="why-text">VTI at 15% still gives you total US market exposure. The 3% trim converts broad-market exposure into yield-focused VYM. Same underlying quality companies, more income focus.</td>
-          </tr>
-          <tr class="shift-row new-entry">
-            <td><span class="sticker" style="color:var(--dividend)">JEPI</span><span class="sticker-sub">0% → 15%</span></td>
-            <td><span class="action-badge new-badge">NEW ENTRY</span></td>
-            <td class="rel-pct" style="color:var(--accent)">+15%</td>
-            <td><span style="color:var(--text3);font-size:10px;">Funded by VGT exit (5%) + QQQ trim (5%) + drift correction (5%)</span></td>
-            <td class="split-detail">From VGT + QQQ proceeds</td>
-            <td class="why-text">JEPI is your cash flow machine. Covered call strategy generates 6–8% annual yield paid monthly — that's real income showing up in your account every month. Introduced here because during accumulation high yield is irrelevant; in harvest it's everything.</td>
+            <td><span class="sticker" style="color:var(--accent4)">VOO</span><span class="sticker-sub">28% -> 25%</span></td>
+            <td><span class="action-badge trim-badge">TRIM -3%</span></td>
+            <td class="rel-pct" style="color:var(--accent3)">-3%</td>
+            <td><div class="into-row"><span class="sticker" style="color:var(--dividend)">VYM</span><span class="into-pct">+2%</span></div><div class="into-row"><span class="sticker" style="color:var(--dividend)">JEPI</span><span class="into-pct">+1%</span></div></td>
+            <td class="split-detail">67% -> VYM<br>33% -> JEPI</td>
+            <td class="why-text">VOO stays as anchor at 25%. Small trim converts S&P 500 growth into yield — VYM dividends + JEPI monthly income for withdrawals.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <div class="net-summary">
-      <div class="ns-title">Net Shift Summary · Compounding → Harvest</div>
+      <div class="ns-title">Net Shift Summary · Compounding -> Harvest</div>
       <div class="ns-grid">
-        <div class="ns-col red-col"><div class="ns-label">Selling / Trimming</div><div class="ns-item"><span style="color:var(--growth)">VGT</span> fully exits (−10%)</div><div class="ns-item"><span style="color:var(--growth)">QQQ</span> trimmed heavily (−10%)</div><div class="ns-item"><span style="color:var(--asymmetric)">SOXX</span> trims (−3%)</div><div class="ns-item"><span style="color:var(--stability)">VTI</span> trims (−3%)</div><div class="ns-total red">−26% of portfolio redeployed</div></div>
-        <div class="ns-arrow">→</div>
-        <div class="ns-col green-col"><div class="ns-label">Buying / Adding</div><div class="ns-item"><span style="color:var(--dividend)">JEPI</span> enters at +15% (new)</div><div class="ns-item"><span style="color:var(--dividend)">SCHD</span> gains +5%</div><div class="ns-item"><span style="color:var(--dividend)">VYM</span> gains +8%</div><div class="ns-item"><span style="color:var(--accent4)">VOO</span> gains +3%</div><div class="ns-total green">+31% into income &amp; stable growth</div></div>
+        <div class="ns-col red-col"><div class="ns-label">Selling / Trimming</div><div class="ns-item"><span style="color:var(--growth)">QQQ</span> trims (-9%)</div><div class="ns-item"><span style="color:var(--growth)">SCHG</span> fully exits (-7%)</div><div class="ns-item"><span style="color:var(--asymmetric)">SOXX</span> fully exits (-5%)</div><div class="ns-item"><span style="color:var(--accent4)">VOO</span> trims (-3%)</div><div class="ns-total red">-24% of portfolio redeployed</div></div>
+        <div class="ns-arrow">-></div>
+        <div class="ns-col green-col"><div class="ns-label">Buying / Adding</div><div class="ns-item"><span style="color:var(--dividend)">JEPI</span> enters +13% (new)</div><div class="ns-item"><span style="color:var(--stability)">USMV</span> enters +5% (new)</div><div class="ns-item"><span style="color:var(--dividend)">SCHD</span> gains +4%</div><div class="ns-item"><span style="color:var(--dividend)">VYM</span> gains +2%</div><div class="ns-total green">+24% into income &amp; stability</div></div>
       </div>
-      <div style="font-size:10px;color:var(--text3);margin-top:8px;">⚠️ Execute inside TFSA/RRSP (no tax hit on rebalance). Do it in January of Year 20 over 1–2 weeks, not all in one day. After this shift, begin 4% SWR monthly withdrawals.</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px;">Execute inside TFSA/RRSP. Do it in January of Year 20 over 1-2 weeks. After this shift, begin SWR monthly withdrawals.</div>
     </div>
   </div>
 
-  <!-- ── Dollar Allocation Breakdown ── -->
+  <!-- Dollar Allocation Breakdown -->
   <div class="card">
-    <div class="card-label">Dollar Allocation per Phase · Start: <span id="alloc-dca-label" style="color:var(--accent)">$500</span> · <span id="alloc-locked-label" style="color:var(--red)">🛑 $0/mo after Yr 15</span></div>
+    <div class="card-label">Dollar Allocation per Phase · Start: <span id="alloc-dca-label" style="color:var(--accent)">$500</span> · <span id="alloc-locked-label" style="color:var(--red)">$0/mo after Yr 15</span></div>
     <div class="dollar-alloc" id="dollar-alloc"></div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════ STRATEGY TAB -->
+<!-- ══════════════════════════════════════════════════ STRATEGY TAB -->
 <div id="tab-strategy" class="tab-content">
   <div class="card" style="margin-bottom:14px;">
     <div class="card-label" style="margin-bottom:12px;">Bear Market Protocol</div>
     <div class="bear-grid">
-      <div class="bc"><div class="bc-title">🐻 Down 10–20%</div><div class="bc-body">Normal correction. Keep DCA unchanged. Consider adding 10–25% extra to core. This is expected — do not pause step-up schedule.</div></div>
-      <div class="bc"><div class="bc-title">📉 Down 20–40%</div><div class="bc-body">Bear market. Double monthly DCA if cash flow allows. Shift asymmetric toward core (VOO, VTI, QQQ). Hold all positions — do not sell.</div></div>
-      <div class="bc"><div class="bc-title">💥 Down 40%+</div><div class="bc-body">Market crash. Deploy any reserves above 6-month emergency fund. Maximize TFSA contribution room. This is a generational buying opportunity.</div></div>
-      <div class="bc"><div class="bc-title">🔄 Recovery Phase</div><div class="bc-body">Never sell during recovery to "lock in gains." Rebalance back to phase allocation annually. VOO and QQQ have always reached new highs.</div></div>
+      <div class="bc"><div class="bc-title">Down 10-20%</div><div class="bc-body">Normal correction. Keep DCA unchanged. Consider adding 10-25% extra to core. Do not pause step-up schedule.</div></div>
+      <div class="bc"><div class="bc-title">Down 20-40%</div><div class="bc-body">Bear market. Double monthly DCA if cash flow allows. Shift asymmetric toward core (VOO, VTI, QQQ). Hold all positions.</div></div>
+      <div class="bc"><div class="bc-title">Down 40%+</div><div class="bc-body">Market crash. Deploy reserves above 6-month emergency fund. Maximize TFSA contribution room. Generational buying opportunity.</div></div>
+      <div class="bc"><div class="bc-title">Recovery Phase</div><div class="bc-body">Never sell during recovery. Rebalance back to phase allocation annually. VOO and QQQ have always reached new highs.</div></div>
     </div>
   </div>
 
   <div class="card" style="margin-bottom:14px;">
-    <div class="card-label" style="margin-bottom:12px;">🍁 Wealthsimple · TFSA/RRSP Optimization</div>
+    <div class="card-label" style="margin-bottom:12px;">Wealthsimple · Tax Optimization</div>
     <div class="tip-grid">
-      <div class="tip-row"><div class="tip-icon">🏦</div><div class="tip-text"><strong>TFSA First, Always</strong> — Max your TFSA room ($7,000/year in 2025) first. All gains — capital gains, dividends — are completely tax-free. VOO, QQQ, SOXX all grow 100% sheltered inside TFSA on Wealthsimple.</div></div>
-      <div class="tip-row"><div class="tip-icon">📋</div><div class="tip-text"><strong>RRSP for US Dividends</strong> — Canada–US tax treaty: US dividends inside RRSP avoid the 15% withholding tax. Put SCHD, VYM, JEPI in RRSP specifically for this benefit. Hold VOO in either (capital growth has no withholding).</div></div>
-      <div class="tip-row"><div class="tip-icon">💱</div><div class="tip-text"><strong>Wealthsimple Premium FX</strong> — Upgrade to Wealthsimple Premium ($10/mo) to eliminate the 1.5% FX spread on USD ETF purchases. On $500/mo in USD ETFs, that's $90/yr saved — pays for itself in a month.</div></div>
-      <div class="tip-row"><div class="tip-icon">🔁</div><div class="tip-text"><strong>Enable DRIP on Wealthsimple</strong> — Turn on Dividend Reinvestment in your Wealthsimple settings. SCHD and VYM dividends auto-reinvest into more shares. Do this until Year 20+. Never manually withdraw dividends early.</div></div>
-      <div class="tip-row"><div class="tip-icon">📅</div><div class="tip-text"><strong>TFSA Lifetime Room</strong> — If eligible since 2009, you have ~$95,000 in lifetime TFSA room. A maxed TFSA invested in VOO + QQQ compounding at 14–15% becomes $1M+ in ~22–25 years.</div></div>
-      <div class="tip-row"><div class="tip-icon">📆</div><div class="tip-text"><strong>Step-Up on Wealthsimple (15-Year Rule)</strong> — Update your recurring auto-deposit every 4 months for the first 15 years. After Year 15, your final monthly amount is locked in permanently — no more manual updates needed. Calendar reminders: Jan 1, May 1, Sep 1 each year for 15 years.</div></div>
+      <div class="tip-row"><div class="tip-icon">1</div><div class="tip-text"><strong>FHSA First (if eligible)</strong> — $8,000/year, $40,000 lifetime. Tax deduction on contribution AND tax-free withdrawal for first home. Double benefit no other account offers. Use for growth ETFs (QQQ, VOO). If you own a home or are ineligible, skip to TFSA.</div></div>
+      <div class="tip-row"><div class="tip-icon">2</div><div class="tip-text"><strong>TFSA Second</strong> — $7,000/year (2025+). All gains completely tax-free — capital gains, dividends, everything. Hold QQQ, SOXX, SCHG here for maximum tax-free growth. Lifetime room ~$95K if eligible since 2009.</div></div>
+      <div class="tip-row"><div class="tip-icon">3</div><div class="tip-text"><strong>RRSP for US Dividends</strong> — Canada-US tax treaty: US dividends inside RRSP avoid the 15% withholding tax. Put SCHD, VYM, JEPI here specifically. RRSP contribution room = 18% of earned income, up to ~$32K/yr.</div></div>
+      <div class="tip-row"><div class="tip-icon">4</div><div class="tip-text"><strong>USD Account — $10/mo</strong> — All 10 ETFs trade in USD. Wealthsimple USD account eliminates 1.5% FX spread. On $500/mo USD buys = $90/yr saved. Waived automatically at $100K+ assets. Pays for itself in Month 1.</div></div>
+      <div class="tip-row"><div class="tip-icon">5</div><div class="tip-text"><strong>Enable DRIP</strong> — Turn on Dividend Reinvestment in Wealthsimple settings. SCHD and VYM dividends auto-reinvest into more shares. Keep DRIP on until Year 20+. Never manually withdraw dividends early.</div></div>
+      <div class="tip-row"><div class="tip-icon">6</div><div class="tip-text"><strong>Step-Up Calendar</strong> — Update recurring auto-deposit every 4 months: Jan 1, May 1, Sep 1 each year for 15 years. After Year 15, final amount is locked permanently — no more updates needed.</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px;">
+    <div class="card-label" style="margin-bottom:12px;">Core Principles</div>
+    <div class="tip-grid">
+      <div class="tip-row"><div class="tip-icon">A</div><div class="tip-text"><strong>Step-Up DCA is Your Greatest Weapon</strong> — 10% increase every 4 months means contributions grow exponentially while early volatility is irrelevant. Even modest step-ups dramatically change 30-year outcomes vs flat DCA.</div></div>
+      <div class="tip-row"><div class="tip-icon">B</div><div class="tip-text"><strong>Reinvest All Dividends Until Year 20+</strong> — DRIP during accumulation and compounding phases. SCHD/VYM dividends reinvested for 20 years become a meaningful compounding multiplier.</div></div>
+      <div class="tip-row"><div class="tip-icon">C</div><div class="tip-text"><strong>Annual Rebalancing — January</strong> — Rebalance once per year inside TFSA/RRSP (no tax consequences). Trim winners back to phase allocation targets. Add to laggards.</div></div>
+      <div class="tip-row"><div class="tip-icon">D</div><div class="tip-text"><strong>Variable SWR</strong> — This model uses 4% SWR for horizons up to 30 years, and a more conservative 3.5% for 35+ year horizons. Based on Morningstar 2026 research showing 3.5% has a 90%+ success rate over 40+ years.</div></div>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-label" style="margin-bottom:12px;">Core Principles</div>
+    <div class="card-label" style="margin-bottom:12px;">Return Expectations · Research-Backed</div>
     <div class="tip-grid">
-      <div class="tip-row"><div class="tip-icon">📈</div><div class="tip-text"><strong>Step-Up DCA is Your Greatest Weapon</strong> — Increasing by 10% every 4 months means your contributions grow faster than your portfolio's early volatility matters. Even modest step-ups dramatically change 30-year outcomes.</div></div>
-      <div class="tip-row"><div class="tip-icon">🔄</div><div class="tip-text"><strong>Reinvest All Dividends Until Year 20+</strong> — DRIP during accumulation and compounding phases. SCHD/VYM dividends reinvested for 20 years become a meaningful compounding multiplier.</div></div>
-      <div class="tip-row"><div class="tip-icon">⚖️</div><div class="tip-text"><strong>Annual Rebalancing — January</strong> — Rebalance once per year inside TFSA/RRSP (no tax consequences). Trim winners back to phase allocation targets. Add to laggards.</div></div>
-      <div class="tip-row"><div class="tip-icon">🚀</div><div class="tip-text"><strong>SOXX + BOTZ: The AI Asymmetric Bet</strong> — Keep 10–20% in semiconductor/AI ETFs during accumulation. The AI infrastructure buildout is a multi-decade supercycle. Volatile — but sized correctly, life-changing.</div></div>
+      <div class="tip-row"><div class="tip-icon">7%</div><div class="tip-text"><strong>Conservative</strong> — Vanguard's 2026 10-year forward estimate for US equities (6.4-8.4% nominal). Accounts for elevated valuations, potential mean reversion, and multiple compression.</div></div>
+      <div class="tip-row"><div class="tip-icon">10%</div><div class="tip-text"><strong>Base Case</strong> — S&P 500 long-term historical average (1926-2025: ~10.2% nominal). Schwab 2026 estimates 9-11% for diversified US equity portfolios over 15+ year periods.</div></div>
+      <div class="tip-row"><div class="tip-icon">14%</div><div class="tip-text"><strong>Optimistic</strong> — Achieved during strong tech/AI cycles. QQQ 10yr CAGR: 18.4%, SOXX: 24.1%. Requires continued AI supercycle and favorable monetary policy. Realistic but not guaranteed.</div></div>
     </div>
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════ ACCOUNT GUIDE TAB -->
+<div id="tab-accounts" class="tab-content">
+  <div style="margin-bottom:16px;font-size:12px;color:var(--text2);line-height:1.7;">
+    <strong style="color:var(--text);font-family:'Syne',sans-serif;">Canadian Tax-Advantaged Account Strategy.</strong> Fill accounts in priority order. Every dollar in the right account compounds tax-free or tax-deferred — the wrong account costs you thousands over 30+ years.
+  </div>
+
+  <!-- Priority Flow -->
+  <div class="priority-flow">
+    <div class="priority-step" style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.3);">
+      <div class="priority-num" style="color:var(--fhsa)">1</div>
+      <div class="priority-label" style="color:var(--fhsa)">FHSA</div>
+      <div class="priority-detail">$8K/yr · if eligible</div>
+    </div>
+    <div class="priority-arrow">-></div>
+    <div class="priority-step" style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);">
+      <div class="priority-num" style="color:var(--tfsa)">2</div>
+      <div class="priority-label" style="color:var(--tfsa)">TFSA</div>
+      <div class="priority-detail">$7K/yr · tax-free</div>
+    </div>
+    <div class="priority-arrow">-></div>
+    <div class="priority-step" style="background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.3);">
+      <div class="priority-num" style="color:var(--rrsp)">3</div>
+      <div class="priority-label" style="color:var(--rrsp)">RRSP</div>
+      <div class="priority-detail">18% income · US divs</div>
+    </div>
+    <div class="priority-arrow">-></div>
+    <div class="priority-step" style="background:rgba(255,255,255,.05);border:1px solid var(--border);">
+      <div class="priority-num" style="color:var(--text3)">4</div>
+      <div class="priority-label" style="color:var(--text3)">Non-Reg</div>
+      <div class="priority-detail">Overflow only</div>
+    </div>
+  </div>
+
+  <!-- Account Cards -->
+  <div class="g3" style="margin-bottom:16px;">
+    <div class="acct-card acct-fhsa">
+      <div class="acct-title" style="color:var(--fhsa)">FHSA</div>
+      <div class="acct-sub">First Home Savings Account</div>
+      <div class="acct-stat"><span>Annual Limit</span><span class="acct-stat-val" style="color:var(--fhsa)">$8,000</span></div>
+      <div class="acct-stat"><span>Lifetime Limit</span><span class="acct-stat-val" style="color:var(--fhsa)">$40,000</span></div>
+      <div class="acct-stat"><span>Carry Forward</span><span class="acct-stat-val">Yes (unused room)</span></div>
+      <div class="acct-stat"><span>Tax Benefit</span><span class="acct-stat-val" style="color:var(--accent)">DOUBLE</span></div>
+      <div style="margin-top:10px;font-size:10px;color:var(--text3);line-height:1.6;">
+        <strong style="color:var(--fhsa)">Why #1:</strong> Tax deduction on contributions (like RRSP) AND tax-free withdrawals for first home (like TFSA). No other account gives both. If you never buy a home, transfers to RRSP at no penalty. Hold growth ETFs: QQQ, VOO.
+      </div>
+    </div>
+
+    <div class="acct-card acct-tfsa">
+      <div class="acct-title" style="color:var(--tfsa)">TFSA</div>
+      <div class="acct-sub">Tax-Free Savings Account</div>
+      <div class="acct-stat"><span>Annual Limit (2025+)</span><span class="acct-stat-val" style="color:var(--tfsa)">$7,000</span></div>
+      <div class="acct-stat"><span>Lifetime Room (since 2009)</span><span class="acct-stat-val" style="color:var(--tfsa)">~$95,000</span></div>
+      <div class="acct-stat"><span>Withdrawals</span><span class="acct-stat-val">Tax-free, any time</span></div>
+      <div class="acct-stat"><span>Re-contribution</span><span class="acct-stat-val">Next Jan 1</span></div>
+      <div style="margin-top:10px;font-size:10px;color:var(--text3);line-height:1.6;">
+        <strong style="color:var(--tfsa)">Why #2:</strong> All gains — capital gains, dividends — completely tax-free forever. Best for highest-growth ETFs: QQQ, SOXX, SCHG. A maxed TFSA at 10% = $1M+ in 25 years. Withdraw in retirement tax-free. No withholding treaty (US dividends taxed 15%).
+      </div>
+    </div>
+
+    <div class="acct-card acct-rrsp">
+      <div class="acct-title" style="color:var(--rrsp)">RRSP</div>
+      <div class="acct-sub">Registered Retirement Savings Plan</div>
+      <div class="acct-stat"><span>Annual Limit</span><span class="acct-stat-val" style="color:var(--rrsp)">18% of income</span></div>
+      <div class="acct-stat"><span>Max (2025)</span><span class="acct-stat-val" style="color:var(--rrsp)">~$32,490</span></div>
+      <div class="acct-stat"><span>Tax Deduction</span><span class="acct-stat-val">Yes, on contribution</span></div>
+      <div class="acct-stat"><span>US Dividend Treaty</span><span class="acct-stat-val" style="color:var(--accent)">0% withholding</span></div>
+      <div style="margin-top:10px;font-size:10px;color:var(--text3);line-height:1.6;">
+        <strong style="color:var(--rrsp)">Why #3:</strong> Canada-US tax treaty eliminates the 15% withholding tax on US dividends inside RRSP. Put dividend ETFs here: SCHD, VYM, JEPI. Tax deduction now, taxed on withdrawal (ideally at lower retirement rate). HBP allows $60K withdrawal for first home.
+      </div>
+    </div>
+  </div>
+
+  <!-- ETF Placement Matrix -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-label">ETF Placement Matrix · Which ETF Goes Where</div>
+    <table class="etf-place-table">
+      <thead><tr><th>ETF</th><th>Best Account</th><th>Why</th><th>Pillar</th></tr></thead>
+      <tbody>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--growth)">QQQ</td><td style="color:var(--tfsa)">TFSA / FHSA</td><td>Max growth tax-free. Capital gains dominate — TFSA shelters 100%.</td><td>Growth</td></tr>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--growth)">SCHG</td><td style="color:var(--tfsa)">TFSA</td><td>Pure growth, minimal dividends. Tax-free compounding maximizes value.</td><td>Growth</td></tr>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--accent4)">VOO</td><td style="color:var(--tfsa)">TFSA / FHSA</td><td>Core anchor. Growth-dominated returns. Works in any tax-advantaged account.</td><td>Stability</td></tr>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--stability)">VTI</td><td style="color:var(--tfsa)">TFSA</td><td>Broad market growth. Similar logic to VOO — shelter cap gains in TFSA.</td><td>Stability</td></tr>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--stability)">VEA</td><td>Any</td><td>International diversification. No US withholding concern (non-US stocks).</td><td>Stability</td></tr>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--stability)">USMV</td><td style="color:var(--tfsa)">TFSA</td><td>Phase 3 only. Low-vol buffer — shelter any gains tax-free in TFSA.</td><td>Stability</td></tr>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--asymmetric)">SOXX</td><td style="color:var(--tfsa)">TFSA</td><td>Highest growth potential. Tax-free cap gains in TFSA maximizes upside.</td><td>Asymmetric</td></tr>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--dividend)">SCHD</td><td style="color:var(--rrsp)">RRSP</td><td>3.5% yield. Treaty eliminates 15% US withholding = $525/yr saved per $100K.</td><td>Dividend</td></tr>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--dividend)">VYM</td><td style="color:var(--rrsp)">RRSP</td><td>2.8% yield. Same treaty benefit. Dividend-heavy = RRSP priority.</td><td>Dividend</td></tr>
+        <tr><td style="font-family:'Syne',sans-serif;font-weight:800;color:var(--dividend)">JEPI</td><td style="color:var(--rrsp)">RRSP</td><td>7-8% yield. Covered call income treated as dividends. Treaty saves most here.</td><td>Dividend</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Contribution Split Calculator -->
+  <div class="card">
+    <div class="card-label">Dynamic Contribution Split · <span id="split-dca" style="color:var(--accent)">$500</span>/mo</div>
+    <div style="margin-bottom:8px;">
+      <label style="font-size:10px;color:var(--text2);display:flex;align-items:center;gap:6px;cursor:pointer;">
+        <input type="checkbox" id="fhsa-toggle" onchange="updateModel()" checked>
+        <span>FHSA eligible (first-time home buyer)</span>
+      </label>
+    </div>
+    <div class="split-bar" id="split-bar"></div>
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-bottom:12px;">
+      <span id="split-fhsa-label"></span>
+      <span id="split-tfsa-label"></span>
+      <span id="split-rrsp-label"></span>
+    </div>
+    <div id="split-detail" style="font-size:10px;color:var(--text2);line-height:1.8;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ INVEST NOW TAB -->
+<div id="tab-investnow" class="tab-content">
+  <div style="margin-bottom:16px;font-size:12px;color:var(--text2);line-height:1.7;">
+    <strong style="color:var(--text);font-family:'Syne',sans-serif;">Monthly Contribution Calculator.</strong> Enter when your investment started and the month you want to invest. The model calculates your exact Step-Up DCA amount, shows per-ETF dollar breakdown, and tells you which account to fund.
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-label">Select Your Month</div>
+    <div class="in-date-row" style="margin-top:8px;">
+      <div class="in-field">
+        <label class="in-label" for="in-start-date">Investment Start Date</label>
+        <input type="date" id="in-start-date" class="in-date" onchange="calcInvestNow()">
+      </div>
+      <div class="in-field">
+        <label class="in-label" for="in-target-date">Calculate For (Month)</label>
+        <input type="date" id="in-target-date" class="in-date" onchange="calcInvestNow()">
+      </div>
+      <button class="in-calc-btn" onclick="calcInvestNow()">Calculate</button>
+      <div style="font-size:10px;color:var(--text3);display:flex;align-items:center;gap:6px;" id="in-month-indicator"></div>
+    </div>
+  </div>
+
+  <div id="in-result-area"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════ ACTUAL RETURNS TAB -->
+<div id="tab-backtest" class="tab-content">
+  <div style="margin-bottom:16px;font-size:12px;color:var(--text2);line-height:1.7;">
+    <strong style="color:var(--text);font-family:'Syne',sans-serif;">Real Historical Backtest.</strong> See what your portfolio would actually be worth if you had started this strategy on a past date. Uses <strong>live ETF price data</strong> — no guessing, no projections.
+  </div>
+
+  <!-- API Key Setup -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-label">Data Source · Free API Key (One-Time Setup)</div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.6;">
+      This tool fetches <strong>real historical prices</strong> from Twelve Data (free financial API with browser support).<br>
+      Get your free API key in 30 seconds — no credit card needed. <strong>800 requests/day free.</strong>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <input type="text" id="bt-api-key" placeholder="Paste your API key here" style="flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:11px;">
+      <button onclick="saveTDKey()" style="background:var(--accent);color:#080c10;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;">Save Key</button>
+      <a href="https://twelvedata.com/pricing" target="_blank" rel="noopener" style="color:var(--accent2);font-size:10px;text-decoration:underline;">Get Free Key →</a>
+    </div>
+    <div id="bt-key-status" style="margin-top:6px;font-size:10px;color:var(--text3);"></div>
+    <details style="margin-top:8px;">
+      <summary style="cursor:pointer;font-size:10px;color:var(--accent2);letter-spacing:.5px;">HOW TO GET YOUR FREE KEY (30 seconds)</summary>
+      <ol style="font-size:10px;color:var(--text2);line-height:1.8;margin-top:6px;padding-left:18px;">
+        <li>Go to <strong>twelvedata.com</strong> → click <strong>Sign Up</strong> (top right)</li>
+        <li>Sign up with Google or email (free plan, no credit card)</li>
+        <li>After login, your <strong>API Key</strong> is shown on the dashboard</li>
+        <li>Copy the key → paste it above → click <strong>Save Key</strong></li>
+        <li>Done! Your key is saved in this browser — you only do this once</li>
+      </ol>
+    </details>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-label">Time Machine · Pick a Start Date</div>
+    <div style="margin-top:8px;">
+      <div class="bt-quick" id="bt-quick-btns">
+        <button class="bt-quick-btn" onclick="setBTQuick(1)">1 Year Ago</button>
+        <button class="bt-quick-btn" onclick="setBTQuick(2)">2 Years</button>
+        <button class="bt-quick-btn" onclick="setBTQuick(3)">3 Years</button>
+        <button class="bt-quick-btn" onclick="setBTQuick(5)">5 Years</button>
+        <button class="bt-quick-btn" onclick="setBTQuick(7)">7 Years</button>
+        <button class="bt-quick-btn" onclick="setBTQuick(10)">10 Years</button>
+      </div>
+      <div class="in-date-row">
+        <div class="in-field">
+          <label class="in-label" for="bt-start-date">Or Pick Exact Start Date</label>
+          <input type="date" id="bt-start-date" class="in-date">
+        </div>
+        <button class="in-calc-btn" onclick="runBacktest()" id="bt-run-btn">Run Backtest</button>
+        <button onclick="clearPriceCache()" style="background:none;border:1px solid var(--border);color:var(--text3);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:9px;letter-spacing:.5px;">Clear Cache</button>
+        <div style="font-size:10px;color:var(--text3);" id="bt-status"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="bt-result-area"></div>
+</div>
+
 <div class="disclaimer">
-  <strong>⚠️ EDUCATIONAL MODEL ONLY — NOT FINANCIAL ADVICE.</strong> Projections are hypothetical. Past ETF returns don't guarantee future performance. All investments carry risk including total loss of principal. Tax treatment depends on your individual situation and account type. Wealthsimple features and fees may change. Consult a registered financial advisor (CFP/CFA) or fee-only planner for personalized guidance. The VOO commentary above is an educational opinion, not a recommendation.
+  <strong>EDUCATIONAL MODEL ONLY — NOT FINANCIAL ADVICE.</strong> Projections are hypothetical based on historical averages. Past ETF returns don't guarantee future performance. All investments carry risk including total loss of principal. Tax treatment depends on individual situation. Wealthsimple features/fees may change. SWR assumptions based on historical withdrawal studies (Trinity, Morningstar 2026). Consult a registered financial advisor (CFP/CFA) for personalized guidance.
 </div>
 <div class="bp"></div>
 </div>
@@ -658,60 +889,52 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 // ══════════════════════════════════════════════════
 // STATE
 // ══════════════════════════════════════════════════
-const state = { dca: 500, stepUp: 10, targetReturn: 15, risk: 'balanced', horizon: 20, market: 'neutral' };
+const state = { dca: 500, stepUp: 10, targetReturn: 10, risk: 'balanced', horizon: 20, market: 'neutral' };
 
 const allocations = {
-  conservative: { growth: 25, stability: 50, asymmetric: 5,  dividend: 20 },
-  balanced:     { growth: 45, stability: 30, asymmetric: 15, dividend: 10 },
-  aggressive:   { growth: 60, stability: 15, asymmetric: 20, dividend: 5  },
-  maximum:      { growth: 50, stability: 10, asymmetric: 35, dividend: 5  }
+  conservative: { growth: 20, stability: 50, asymmetric: 5,  dividend: 25 },
+  balanced:     { growth: 35, stability: 35, asymmetric: 15, dividend: 15 },
+  aggressive:   { growth: 50, stability: 20, asymmetric: 20, dividend: 10 },
+  maximum:      { growth: 45, stability: 10, asymmetric: 35, dividend: 10 }
 };
 
-const marketMod = { bear: -3, neutral: 0, bull: 3 };
+const marketMod = { bear: -2, neutral: 0, bull: 2 };
 
 const recETFs = {
-  conservative: ['VOO','VTI','USMV','SCHD','VYM'],
-  balanced:     ['VOO','QQQ','SCHD','SOXX','VTI'],
-  aggressive:   ['QQQ','VGT','SOXX','SMH','BOTZ'],
-  maximum:      ['SOXX','SMH','BOTZ','QQQ','VGT']
+  conservative: ['VOO','VTI','SCHD','VYM','VEA'],
+  balanced:     ['VOO','QQQ','SCHD','VTI','SOXX'],
+  aggressive:   ['QQQ','SOXX','SCHG','VOO','VTI'],
+  maximum:      ['SOXX','QQQ','SCHG','VOO','VTI']
 };
 
 const etfColors = {
-  VOO:'#ffd700', QQQ:'#00d4aa', VGT:'#00d4aa', SCHG:'#00d4aa',
+  VOO:'#ffd700', QQQ:'#00d4aa', SCHG:'#00d4aa',
   VTI:'#0088ff', USMV:'#0088ff', VEA:'#0088ff',
-  SOXX:'#ff6b35', SMH:'#ff6b35', BOTZ:'#ff6b35',
+  SOXX:'#ff6b35',
   SCHD:'#ffd700', VYM:'#ffd700', JEPI:'#ffd700'
 };
 
-// Phase allocation definitions for dollar breakdown
 const phaseAllocs = [
-  { phase:'Accumulation', years:'Yrs 1–10', color:'var(--growth)',
-    rows:[{etf:'QQQ',pct:25,color:'var(--growth)'},{etf:'VOO',pct:20,color:'var(--accent4)'},{etf:'VGT',pct:15,color:'var(--growth)'},{etf:'VTI',pct:15,color:'var(--stability)'},{etf:'SOXX',pct:10,color:'var(--asymmetric)'},{etf:'BOTZ',pct:10,color:'var(--asymmetric)'},{etf:'SCHD',pct:5,color:'var(--dividend)'}]},
-  { phase:'Compounding', years:'Yrs 10–20', color:'var(--stability)',
-    rows:[{etf:'VOO',pct:22,color:'var(--accent4)'},{etf:'QQQ',pct:20,color:'var(--growth)'},{etf:'VTI',pct:18,color:'var(--stability)'},{etf:'SCHD',pct:15,color:'var(--dividend)'},{etf:'VGT',pct:10,color:'var(--growth)'},{etf:'SOXX',pct:8,color:'var(--asymmetric)'},{etf:'VYM',pct:7,color:'var(--dividend)'}]},
+  { phase:'Accumulation', years:'Yrs 1-10', color:'var(--growth)',
+    rows:[{etf:'QQQ',pct:25,color:'var(--growth)'},{etf:'VOO',pct:25,color:'var(--accent4)'},{etf:'SOXX',pct:15,color:'var(--asymmetric)'},{etf:'SCHG',pct:10,color:'var(--growth)'},{etf:'VTI',pct:10,color:'var(--stability)'},{etf:'SCHD',pct:10,color:'var(--dividend)'},{etf:'VEA',pct:5,color:'var(--stability)'}]},
+  { phase:'Compounding', years:'Yrs 10-20', color:'var(--stability)',
+    rows:[{etf:'VOO',pct:28,color:'var(--accent4)'},{etf:'SCHD',pct:18,color:'var(--dividend)'},{etf:'QQQ',pct:17,color:'var(--growth)'},{etf:'VYM',pct:10,color:'var(--dividend)'},{etf:'VTI',pct:10,color:'var(--stability)'},{etf:'SCHG',pct:7,color:'var(--growth)'},{etf:'SOXX',pct:5,color:'var(--asymmetric)'},{etf:'VEA',pct:5,color:'var(--stability)'}]},
   { phase:'Harvest', years:'Yrs 20+', color:'var(--dividend)',
-    rows:[{etf:'VOO',pct:20,color:'var(--accent4)'},{etf:'SCHD',pct:20,color:'var(--dividend)'},{etf:'JEPI',pct:15,color:'var(--dividend)'},{etf:'VTI',pct:15,color:'var(--stability)'},{etf:'VYM',pct:15,color:'var(--dividend)'},{etf:'QQQ',pct:10,color:'var(--growth)'},{etf:'SOXX',pct:5,color:'var(--asymmetric)'}]}
+    rows:[{etf:'VOO',pct:25,color:'var(--accent4)'},{etf:'SCHD',pct:22,color:'var(--dividend)'},{etf:'JEPI',pct:13,color:'var(--dividend)'},{etf:'VYM',pct:12,color:'var(--dividend)'},{etf:'VTI',pct:10,color:'var(--stability)'},{etf:'QQQ',pct:8,color:'var(--growth)'},{etf:'VEA',pct:5,color:'var(--stability)'},{etf:'USMV',pct:5,color:'var(--stability)'}]}
 ];
 
-// Projection horizons (all of them)
 const ALL_HORIZONS = [5,10,15,20,25,30,35,40,45,50,55,60];
+const CONTRIB_STOP_MONTHS = 180;
 
 let growthChart, projChart;
 
 // ══════════════════════════════════════════════════
 // CALCULATIONS
 // ══════════════════════════════════════════════════
-//
-// CONTRIBUTION RULES:
-//   • Months 1–180 (Years 1–15): step-up DCA active.
-//     Every 4 months the contribution increases by stepUpPct%.
-//   • After month 180: ZERO new contributions.
-//     The lump sum at end of year 15 compounds freely at annualRate.
+function getSWR(horizonYears) {
+  return horizonYears >= 35 ? 0.035 : 0.04;
+}
 
-const CONTRIB_STOP_MONTHS = 180; // 15 years
-
-// ── FIX 2: Precompute the full 180-month contribution schedule once ──
-// Returns array[0..179] of monthly amounts (index = month-1).
 function buildContribSchedule(startMonthly, stepUpPct) {
   const schedule = [];
   let monthly = startMonthly;
@@ -722,8 +945,6 @@ function buildContribSchedule(startMonthly, stepUpPct) {
   return schedule;
 }
 
-// Returns the stepped-up monthly amount at a given month (1-indexed).
-// Uses precomputed schedule when available, otherwise computes directly.
 function monthlyAtMonth(startMonthly, stepUpPct, m) {
   if (m > CONTRIB_STOP_MONTHS) return 0;
   let monthly = startMonthly;
@@ -733,28 +954,15 @@ function monthlyAtMonth(startMonthly, stepUpPct, m) {
   return monthly;
 }
 
-// ── FIX 1: Per-update memoization cache ──
-// Key: "start|stepUp|rate|years" → result object
 let _calcCache = {};
 function clearCalcCache() { _calcCache = {}; }
 
-// Main engine with memoization.
-// Phase 1 (months 1-180): step-up contributions compound month by month.
-// Phase 2 (months 181+):  lump sum compounds with no new deposits.
-// Returns { value, invested, valueAt15, finalContribMonthly }
 function calcStepUpFV(startMonthly, stepUpPct, annualRate, years) {
   const key = `${startMonthly}|${stepUpPct}|${annualRate}|${years}`;
   if (_calcCache[key]) return _calcCache[key];
-
   const r = annualRate / 100 / 12;
   const totalMonths = years * 12;
-
-  // Phase 1: build up over up to 15 years with step-up contributions
-  let pv = 0;
-  let monthly = startMonthly;
-  let totalInvested = 0;
-  let finalContribMonthly = startMonthly;
-
+  let pv = 0, monthly = startMonthly, totalInvested = 0, finalContribMonthly = startMonthly;
   const phase1Months = Math.min(totalMonths, CONTRIB_STOP_MONTHS);
   for (let m = 1; m <= phase1Months; m++) {
     if (m > 1 && (m - 1) % 4 === 0) monthly *= (1 + stepUpPct / 100);
@@ -763,19 +971,13 @@ function calcStepUpFV(startMonthly, stepUpPct, annualRate, years) {
     finalContribMonthly = monthly;
   }
   const valueAt15 = pv;
-
-  // Phase 2: lump sum compounds freely, zero new money
   const phase2Months = totalMonths - phase1Months;
-  if (phase2Months > 0) {
-    pv = pv * Math.pow(1 + r, phase2Months);
-  }
-
+  if (phase2Months > 0) pv = pv * Math.pow(1 + r, phase2Months);
   const result = { value: pv, invested: totalInvested, valueAt15, finalContribMonthly };
   _calcCache[key] = result;
   return result;
 }
 
-// Flat DCA reference — also stops contributions after 15 yrs for fair comparison
 function calcFlatFV(monthly, annualRate, years) {
   const key = `flat|${monthly}|${annualRate}|${years}`;
   if (_calcCache[key]) return _calcCache[key];
@@ -788,9 +990,8 @@ function calcFlatFV(monthly, annualRate, years) {
   return pv;
 }
 
-// ── FIX 4: Corrected fmt — no $999K→$1,000K gap, proper M/B thresholds ──
 function fmt(n) {
-  if (!isFinite(n) || isNaN(n)) return '$—';
+  if (!isFinite(n) || isNaN(n)) return '$--';
   const abs = Math.abs(n);
   if (abs >= 1e9)  return '$' + (n / 1e9).toFixed(2) + 'B';
   if (abs >= 1e6)  return '$' + (n / 1e6).toFixed(abs >= 10e6 ? 1 : 2) + 'M';
@@ -798,7 +999,6 @@ function fmt(n) {
   return '$' + Math.round(n);
 }
 
-// ── FIX 5: Debounce utility ──
 function debounce(fn, ms) {
   let timer;
   return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
@@ -808,28 +1008,25 @@ function debounce(fn, ms) {
 // CONTROLS
 // ══════════════════════════════════════════════════
 function setRisk(btn) {
-  document.querySelectorAll('.risk-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); state.risk=btn.dataset.risk; updateModel();
+  document.querySelectorAll('.risk-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); state.risk = btn.dataset.risk; updateModel();
 }
 function setHorizon(btn) {
-  document.querySelectorAll('.horizon-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); state.horizon=+btn.dataset.h; updateModel();
+  document.querySelectorAll('.horizon-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); state.horizon = +btn.dataset.h; updateModel();
 }
 function setMarket(btn) {
-  document.querySelectorAll('.market-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); state.market=btn.dataset.m; updateModel();
+  document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); state.market = btn.dataset.m; updateModel();
 }
 
-// ── FIX 5: Debounced update — sliders call this, won't thrash on drag ──
 const debouncedUpdate = debounce(updateModel, 60);
 
 // ══════════════════════════════════════════════════
 // MAIN UPDATE
 // ══════════════════════════════════════════════════
 function updateModel() {
-  // Clear memoization cache whenever inputs change
   clearCalcCache();
-
   state.dca = +document.getElementById('dca-slider').value;
   state.stepUp = +document.getElementById('stepup-slider').value;
   state.targetReturn = +document.getElementById('return-slider').value;
@@ -839,55 +1036,57 @@ function updateModel() {
   document.getElementById('return-val').textContent = state.targetReturn.toFixed(1) + '%';
   document.getElementById('proj-dca').textContent = '$' + state.dca.toLocaleString();
   document.getElementById('proj-stepup').textContent = state.stepUp + '%';
-  document.getElementById('risk-label').textContent = state.risk.charAt(0).toUpperCase()+state.risk.slice(1);
+  document.getElementById('risk-label').textContent = state.risk.charAt(0).toUpperCase() + state.risk.slice(1);
   document.getElementById('alloc-dca-label').textContent = '$' + state.dca.toLocaleString();
+  document.getElementById('split-dca').textContent = '$' + state.dca.toLocaleString();
 
-  // Step-up info box — contributions stop entirely after 15 years
+  // Step-up info box
   const m4  = state.dca * Math.pow(1 + state.stepUp/100, 1);
   const m8  = state.dca * Math.pow(1 + state.stepUp/100, 2);
   const m12 = state.dca * Math.pow(1 + state.stepUp/100, 3);
   const lockedAmt = Math.round(monthlyAtMonth(state.dca, state.stepUp, 180));
   document.getElementById('stepup-info').innerHTML =
-    `<strong>Step-Up Schedule (contributions stop entirely after Year 15)</strong><br>` +
-    `Mo 1–4: $${state.dca.toLocaleString()} · Mo 5–8: $${Math.round(m4).toLocaleString()} · Mo 9–12: $${Math.round(m8).toLocaleString()} · Mo 13–16: $${Math.round(m12).toLocaleString()}<br>` +
-    `🛑 After Year 15: <strong style="color:var(--red)">$0/mo — zero contributions.</strong> Portfolio compounds freely from the <span style="color:var(--accent)">$${lockedAmt.toLocaleString()}/mo</span> final lump sum.`;
+    `<strong>Step-Up Schedule (contributions stop after Year 15)</strong><br>` +
+    `Mo 1-4: $${state.dca.toLocaleString()} · Mo 5-8: $${Math.round(m4).toLocaleString()} · Mo 9-12: $${Math.round(m8).toLocaleString()} · Mo 13-16: $${Math.round(m12).toLocaleString()}<br>` +
+    `After Year 15: <strong style="color:var(--red)">$0/mo — zero contributions.</strong> Portfolio compounds freely from the <span style="color:var(--accent)">$${lockedAmt.toLocaleString()}/mo</span> final amount.`;
 
   // Allocations
   const a = allocations[state.risk];
   let adj = { ...a };
-  if (state.market === 'bear') { adj.asymmetric = Math.max(0, a.asymmetric-5); adj.stability = Math.min(100,a.stability+5); }
-  else if (state.market === 'bull') { adj.asymmetric = Math.min(40,a.asymmetric+5); adj.stability = Math.max(0,a.stability-5); }
+  if (state.market === 'bear') { adj.asymmetric = Math.max(0, a.asymmetric - 5); adj.stability = Math.min(100, a.stability + 5); }
+  else if (state.market === 'bull') { adj.asymmetric = Math.min(40, a.asymmetric + 5); adj.stability = Math.max(0, a.stability - 5); }
   ['growth','stability','asymmetric','dividend'].forEach(k => {
-    document.getElementById('al-'+k).textContent = adj[k]+'%';
-    document.getElementById('bar-'+k).style.width = adj[k]+'%';
+    document.getElementById('al-' + k).textContent = adj[k] + '%';
+    document.getElementById('bar-' + k).style.width = adj[k] + '%';
   });
 
-  // Stats — contributions stop after 15 years, pure compounding after
+  // Stats
   const adjRate = state.targetReturn + marketMod[state.market];
   const { value: fv, invested, valueAt15, finalContribMonthly } = calcStepUpFV(state.dca, state.stepUp, adjRate, state.horizon);
-  const income = (fv * 0.04) / 12; // 4% SWR annual ÷ 12
+  const swr = getSWR(state.horizon);
+  const income = (fv * swr) / 12;
 
   document.getElementById('sv-proj').textContent = fmt(fv);
   document.getElementById('sv-proj-sub').textContent = `yr ${state.horizon} · 0 contributions after yr 15`;
   document.getElementById('sv-inv').textContent = fmt(invested);
-  document.getElementById('sv-inv-sub').textContent = `invested yrs 1–15 only`;
-  document.getElementById('sv-mult').textContent = (fv/invested).toFixed(1)+'x';
-  document.getElementById('sv-mult-sub').textContent = '+'+fmt(fv-invested)+' pure growth';
-  document.getElementById('sv-income').textContent = fmt(income)+'/mo';
+  document.getElementById('sv-inv-sub').textContent = 'invested yrs 1-15 only';
+  document.getElementById('sv-mult').textContent = (fv / invested).toFixed(1) + 'x';
+  document.getElementById('sv-mult-sub').textContent = '+' + fmt(fv - invested) + ' pure growth';
+  document.getElementById('sv-income').textContent = fmt(income) + '/mo';
+  document.getElementById('sv-income-sub').textContent = `${(swr * 100)}% SWR / 12 at end`;
   document.getElementById('sv-at15').textContent = fmt(valueAt15);
   document.getElementById('sv-at15-sub').textContent = `lump sum at yr 15 · last DCA $${Math.round(finalContribMonthly).toLocaleString()}/mo`;
 
-  // Growth chart — show contribution phase (0–15) vs compounding phase (15+)
+  // Growth chart
   if (growthChart) {
     const labels = [], stepVals = [], flatVals = [], invVals = [];
     for (let y = 0; y <= state.horizon; y++) {
-      labels.push('Yr '+y);
+      labels.push('Yr ' + y);
       if (y === 0) { stepVals.push(0); flatVals.push(0); invVals.push(0); }
       else {
         const sv = calcStepUpFV(state.dca, state.stepUp, adjRate, y);
         stepVals.push(sv.value);
         flatVals.push(calcFlatFV(state.dca, adjRate, y));
-        // Invested only grows during yrs 1-15
         invVals.push(sv.invested);
       }
     }
@@ -898,7 +1097,6 @@ function updateModel() {
     growthChart.update();
   }
 
-  // Step-up schedule table (24 months)
   buildStepUpTable();
 
   // Rec ETFs
@@ -907,61 +1105,43 @@ function updateModel() {
   container.innerHTML = '';
   etfs.forEach(ticker => {
     const span = document.createElement('span');
-    const color = etfColors[ticker]||'#8ab0a0';
+    const color = etfColors[ticker] || '#8ab0a0';
     span.style.cssText = `padding:5px 12px;background:rgba(0,0,0,.3);border:1px solid ${color}44;color:${color};border-radius:4px;font-family:'Syne',sans-serif;font-weight:800;font-size:12px;`;
     span.textContent = ticker;
     container.appendChild(span);
   });
 
-  // Projections table
   buildProjectionsTable();
   if (projChart) {
-    const hs = ALL_HORIZONS;
-    projChart.data.datasets[0].data = hs.map(h => calcStepUpFV(state.dca, state.stepUp, 15, h).invested);
-    projChart.data.datasets[1].data = hs.map(h => { const sv=calcStepUpFV(state.dca,state.stepUp,15,h); return sv.value-sv.invested; });
-    projChart.data.datasets[2].data = hs.map(h => calcFlatFV(state.dca, 15, h));
+    const baseRate = 10;
+    projChart.data.datasets[0].data = ALL_HORIZONS.map(h => calcStepUpFV(state.dca, state.stepUp, baseRate, h).invested);
+    projChart.data.datasets[1].data = ALL_HORIZONS.map(h => { const sv = calcStepUpFV(state.dca, state.stepUp, baseRate, h); return sv.value - sv.invested; });
+    projChart.data.datasets[2].data = ALL_HORIZONS.map(h => calcFlatFV(state.dca, baseRate, h));
     projChart.update();
   }
 
-  // Dollar allocation
   buildDollarAlloc();
+  buildAccountSplit();
 }
 
-// ── FIX 3: Full 15-year step-up schedule shown as yearly milestones ──
 function buildStepUpTable() {
   const schedule = buildContribSchedule(state.dca, state.stepUp);
-  // Summarise by year: show the DCA at start of year, total invested that year, running total
-  let html = `<thead><tr>
-    <th>Year</th>
-    <th>DCA at Start of Year</th>
-    <th>DCA at End of Year</th>
-    <th>Invested This Year</th>
-    <th>Cumulative Invested</th>
-  </tr></thead><tbody>`;
-
+  let html = `<thead><tr><th>Year</th><th>DCA at Start</th><th>DCA at End</th><th>Invested This Year</th><th>Cumulative</th></tr></thead><tbody>`;
   let cumulative = 0;
   for (let yr = 1; yr <= 15; yr++) {
-    const startIdx = (yr - 1) * 12;      // month index for start of year
-    const endIdx   = yr * 12 - 1;         // month index for end of year
+    const startIdx = (yr - 1) * 12;
+    const endIdx = yr * 12 - 1;
     const startAmt = schedule[startIdx];
-    const endAmt   = schedule[endIdx];
+    const endAmt = schedule[endIdx];
     let yearTotal = 0;
     for (let m = startIdx; m <= endIdx; m++) yearTotal += schedule[m];
     cumulative += yearTotal;
-
     const isShift1 = yr === 10;
-    const isShift2 = yr === 15;
-    const rowStyle = isShift2
-      ? ' style="background:rgba(255,68,85,.05);border-left:2px solid var(--red);"'
-      : isShift1
-      ? ' style="background:rgba(255,107,53,.04);border-left:2px solid var(--accent3);"'
-      : '';
-    const tag = isShift2
-      ? ' <span style="font-size:8px;color:var(--red);font-family:Syne,sans-serif;font-weight:700;">🛑 STOP</span>'
-      : isShift1
-      ? ' <span style="font-size:8px;color:var(--accent3);font-family:Syne,sans-serif;font-weight:700;">⟳ SHIFT 01</span>'
-      : '';
-
+    const isStop = yr === 15;
+    const rowStyle = isStop ? ' style="background:rgba(255,68,85,.05);border-left:2px solid var(--red);"'
+      : isShift1 ? ' style="background:rgba(255,107,53,.04);border-left:2px solid var(--accent3);"' : '';
+    const tag = isStop ? ' <span style="font-size:8px;color:var(--red);font-family:Syne,sans-serif;font-weight:700;">STOP</span>'
+      : isShift1 ? ' <span style="font-size:8px;color:var(--accent3);font-family:Syne,sans-serif;font-weight:700;">SHIFT 01</span>' : '';
     html += `<tr${rowStyle}>
       <td style="font-family:'Syne',sans-serif;font-weight:700;color:var(--text)">Yr ${yr}${tag}</td>
       <td style="color:var(--accent);font-family:'Syne',sans-serif;font-weight:600;">$${Math.round(startAmt).toLocaleString()}</td>
@@ -970,86 +1150,69 @@ function buildStepUpTable() {
       <td class="sb">$${Math.round(cumulative).toLocaleString()}</td>
     </tr>`;
   }
-
-  // Stop row
   const lastAmt = schedule[179];
   html += `<tr style="background:rgba(255,68,85,.06);">
-    <td colspan="2" style="color:var(--red);font-family:'Syne',sans-serif;font-weight:700;">🛑 Year 16+ · $0/mo</td>
+    <td colspan="2" style="color:var(--red);font-family:'Syne',sans-serif;font-weight:700;">Year 16+ · $0/mo</td>
     <td style="color:var(--text3);font-size:10px;">Last contribution</td>
     <td style="color:var(--red);font-family:'Syne',sans-serif;font-weight:700;">$${Math.round(lastAmt).toLocaleString()}/mo</td>
     <td style="color:var(--text3);font-size:10px;">Portfolio compounds freely</td>
-  </tr>`;
-
-  html += '</tbody>';
+  </tr></tbody>`;
   document.getElementById('stepup-table').innerHTML = html;
 }
 
 function buildProjectionsTable() {
-  const milestones = { 15:'🔒 Contributions stop', 20:'Decade 2', 30:'Decade 3', 40:'Decade 4', 50:'Half Century', 60:'60 Years' };
+  const milestones = { 15:'Contributions stop', 20:'Decade 2', 30:'Decade 3', 40:'Decade 4', 50:'Half Century', 60:'60 Years' };
   let html = `<thead><tr>
     <th>Horizon</th>
-    <th>Total Invested<br><span style="font-size:8px;color:var(--text3)">Yrs 1–15 only</span></th>
-    <th class="sl">11.5%</th>
-    <th class="sb">15%</th>
-    <th class="sh">20%</th>
-    <th style="color:var(--accent2)">Flat DCA<br><span style="font-size:8px;color:var(--text3)">15% ref</span></th>
-    <th style="color:var(--dividend)">4% SWR/mo<br><span style="font-size:8px;color:var(--text3)">base scenario</span></th>
+    <th>Total Invested<br><span style="font-size:8px;color:var(--text3)">Yrs 1-15 only</span></th>
+    <th class="sl">7%</th>
+    <th class="sb">10%</th>
+    <th class="sh">14%</th>
+    <th style="color:var(--accent2)">Flat DCA<br><span style="font-size:8px;color:var(--text3)">10% ref</span></th>
+    <th style="color:var(--dividend)">SWR/mo<br><span style="font-size:8px;color:var(--text3)">base scenario</span></th>
   </tr></thead><tbody>`;
-
   ALL_HORIZONS.forEach(h => {
-    const low  = calcStepUpFV(state.dca, state.stepUp, 11.5, h);
-    const base = calcStepUpFV(state.dca, state.stepUp, 15,   h);
-    const high = calcStepUpFV(state.dca, state.stepUp, 20,   h);
-    const flat = calcFlatFV(state.dca, 15, h);
-    // 4% SWR: 4% of portfolio per year ÷ 12 months
-    const income = (base.value * 0.04) / 12;
+    const low  = calcStepUpFV(state.dca, state.stepUp, 7, h);
+    const base = calcStepUpFV(state.dca, state.stepUp, 10, h);
+    const high = calcStepUpFV(state.dca, state.stepUp, 14, h);
+    const flat = calcFlatFV(state.dca, 10, h);
+    const swr = getSWR(h);
+    const income = (base.value * swr) / 12;
     const ms = milestones[h] ? `<br><span class="milestone">${milestones[h]}</span>` : '';
-    // Highlight the yr-15 row (contribution stop point)
     const rowStyle = h === 15 ? ' style="background:rgba(0,212,170,.05);border-left:2px solid var(--accent);"' : '';
+    const swrLabel = h >= 35 ? '3.5%' : '4%';
     html += `<tr${rowStyle}>
       <td><span class="hor">${h} yrs</span>${ms}</td>
-      <td class="inv">${h <= 15 ? fmt(base.invested) : '<span style="color:var(--text3)">—</span>'}</td>
+      <td class="inv">${h <= 15 ? fmt(base.invested) : '<span style="color:var(--text3)">--</span>'}</td>
       <td class="sl">${fmt(low.value)}</td>
       <td class="sb">${fmt(base.value)}</td>
       <td class="sh">${fmt(high.value)}</td>
       <td style="color:var(--accent2)">${fmt(flat)}</td>
-      <td style="color:var(--dividend)">${fmt(income)}/mo</td>
+      <td style="color:var(--dividend)">${fmt(income)}/mo <span style="font-size:8px;color:var(--text3)">${swrLabel}</span></td>
     </tr>`;
   });
   document.getElementById('proj-table').innerHTML = html + '</tbody>';
 }
 
 function buildDollarAlloc() {
-  // Compute the representative monthly DCA for each phase:
-  // Phase 0 Accumulation (Yrs 1-10): starting DCA = month 1
-  // Phase 1 Compounding (Yrs 10-20): stepped-up amount at month 121 (start of yr 10)
-  // Phase 2 Harvest (Yrs 20+): locked final amount after 15 yrs of step-ups (month 180)
   const startM = state.dca;
-  const accMonthly     = Math.round(startM);
-  const compMonthly    = Math.round(monthlyAtMonth(startM, state.stepUp, 121));
+  const accMonthly = Math.round(startM);
+  const compMonthly = Math.round(monthlyAtMonth(startM, state.stepUp, 121));
   const harvestMonthly = Math.round(monthlyAtMonth(startM, state.stepUp, 180));
-  const phaseMonthly   = [accMonthly, compMonthly, harvestMonthly];
-  const phaseNotes = [
-    'Starting amount · Month 1',
-    'Stepped-up amount at Year 10',
-    '🛑 No new contributions after Yr 15 · rebalancing reference only'
-  ];
-
-  document.getElementById('alloc-dca-label').textContent = '$' + state.dca.toLocaleString();
-  document.getElementById('alloc-locked-label').textContent =
-    '🛑 $0/mo after Yr 15 · last contribution $' + harvestMonthly.toLocaleString();
-
+  const phaseMonthly = [accMonthly, compMonthly, harvestMonthly];
+  const phaseNotes = ['Starting amount · Month 1', 'Stepped-up amount at Year 10', 'No new contributions after Yr 15 · reference only'];
+  document.getElementById('alloc-locked-label').textContent = '$0/mo after Yr 15 · last contribution $' + harvestMonthly.toLocaleString();
   const container = document.getElementById('dollar-alloc');
   container.innerHTML = '';
   phaseAllocs.forEach((phase, idx) => {
     const monthly = phaseMonthly[idx];
-    const isHarvest = idx === 2; // no contributions in harvest
+    const isHarvest = idx === 2;
     let html = `<div class="da-card">
       <div class="da-phase" style="color:${phase.color}">${phase.phase} · ${phase.years}</div>
-      <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">${phaseNotes[idx]}${!isHarvest ? ' · <span style="color:var(--accent2);font-family:Syne,sans-serif;font-weight:700;">$'+monthly.toLocaleString()+'/mo</span>' : ''}</div>
+      <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">${phaseNotes[idx]}${!isHarvest ? ' · <span style="color:var(--accent2);font-family:Syne,sans-serif;font-weight:700;">$' + monthly.toLocaleString() + '/mo</span>' : ''}</div>
       <div class="da-rows">`;
     phase.rows.forEach(r => {
-      const amt = isHarvest ? '—' : '$' + Math.round(monthly * r.pct / 100).toLocaleString();
+      const amt = isHarvest ? '--' : '$' + Math.round(monthly * r.pct / 100).toLocaleString();
       const amtColor = isHarvest ? 'var(--text3)' : r.color;
       html += `<div class="da-row">
         <span class="da-etf" style="color:${r.color}">${r.etf}</span>
@@ -1058,13 +1221,50 @@ function buildDollarAlloc() {
       </div>`;
     });
     const totalLabel = isHarvest
-      ? `<span style="color:var(--red)">$0 new contributions</span><span style="color:var(--text3)">rebalance existing holdings</span>`
-      : `<span>Monthly into this phase</span><span style="color:var(--accent)">$${monthly.toLocaleString()} total</span>`;
-    html += `</div>
-      <div class="da-total">${totalLabel}</div>
-    </div>`;
+      ? `<span style="color:var(--red)">$0 new contributions</span><span style="color:var(--text3)">rebalance existing</span>`
+      : `<span>Monthly total</span><span style="color:var(--accent)">$${monthly.toLocaleString()}</span>`;
+    html += `</div><div class="da-total">${totalLabel}</div></div>`;
     container.innerHTML += html;
   });
+}
+
+function buildAccountSplit() {
+  const monthly = state.dca;
+  const fhsaEligible = document.getElementById('fhsa-toggle').checked;
+  const fhsaMonthly = fhsaEligible ? Math.min(Math.round(8000 / 12), monthly) : 0;
+  const afterFhsa = monthly - fhsaMonthly;
+  const tfsaMonthly = Math.min(Math.round(7000 / 12), afterFhsa);
+  const afterTfsa = afterFhsa - tfsaMonthly;
+  const rrspMonthly = afterTfsa;
+
+  const bar = document.getElementById('split-bar');
+  const total = monthly || 1;
+  const fhsaPct = (fhsaMonthly / total * 100).toFixed(1);
+  const tfsaPct = (tfsaMonthly / total * 100).toFixed(1);
+  const rrspPct = (rrspMonthly / total * 100).toFixed(1);
+
+  let barHtml = '';
+  if (fhsaMonthly > 0) barHtml += `<div class="split-seg" style="width:${fhsaPct}%;background:var(--fhsa)">FHSA</div>`;
+  if (tfsaMonthly > 0) barHtml += `<div class="split-seg" style="width:${tfsaPct}%;background:var(--tfsa)">TFSA</div>`;
+  if (rrspMonthly > 0) barHtml += `<div class="split-seg" style="width:${rrspPct}%;background:var(--rrsp)">RRSP</div>`;
+  bar.innerHTML = barHtml;
+
+  document.getElementById('split-fhsa-label').textContent = fhsaEligible ? `FHSA $${fhsaMonthly}/mo` : '';
+  document.getElementById('split-tfsa-label').textContent = `TFSA $${tfsaMonthly}/mo`;
+  document.getElementById('split-rrsp-label').textContent = rrspMonthly > 0 ? `RRSP $${rrspMonthly}/mo` : '';
+
+  let detail = '';
+  if (fhsaEligible && fhsaMonthly > 0) {
+    detail += `<div><span style="color:var(--fhsa);font-family:'Syne',sans-serif;font-weight:700;">FHSA $${fhsaMonthly}/mo</span> ($${fhsaMonthly * 12}/yr of $8,000 limit) — Hold QQQ + VOO for max tax-free growth + deduction</div>`;
+  }
+  detail += `<div><span style="color:var(--tfsa);font-family:'Syne',sans-serif;font-weight:700;">TFSA $${tfsaMonthly}/mo</span> ($${tfsaMonthly * 12}/yr of $7,000 limit) — Hold SOXX + SCHG + remaining growth ETFs</div>`;
+  if (rrspMonthly > 0) {
+    detail += `<div><span style="color:var(--rrsp);font-family:'Syne',sans-serif;font-weight:700;">RRSP $${rrspMonthly}/mo</span> (overflow) — Hold SCHD + VYM for US dividend treaty benefit</div>`;
+  }
+  if (monthly < 1250) {
+    detail += `<div style="color:var(--text3);margin-top:4px;">At $${monthly}/mo, you stay within FHSA+TFSA limits. No RRSP needed yet — add RRSP when DCA exceeds ~$1,250/mo.</div>`;
+  }
+  document.getElementById('split-detail').innerHTML = detail;
 }
 
 // ══════════════════════════════════════════════════
@@ -1076,7 +1276,7 @@ function initCharts() {
     titleColor:'#e8f4f0', bodyColor:'#8ab0a0',
     titleFont:{family:'Syne',size:11,weight:'700'},
     bodyFont:{family:'JetBrains Mono',size:10},
-    callbacks:{ label: ctx => ' '+fmt(ctx.raw) }
+    callbacks:{ label: ctx => ' ' + fmt(ctx.raw) }
   };
   const scaleCfg = {
     x:{ grid:{color:'rgba(255,255,255,.03)'}, ticks:{color:'#4a7060',font:{family:'JetBrains Mono',size:9}} },
@@ -1101,11 +1301,11 @@ function initCharts() {
   projChart = new Chart(document.getElementById('projChart').getContext('2d'), {
     type:'bar',
     data:{
-      labels:['5','10','15','20','25','30','35','40','45','50','55','60'].map(x=>x+' yrs'),
+      labels: ALL_HORIZONS.map(x => x + ' yrs'),
       datasets:[
         { label:'Total Invested', data:[], backgroundColor:'rgba(30,45,58,.9)', borderColor:'#243545', borderWidth:1 },
-        { label:'Gains (Step-Up 15%)', data:[], backgroundColor:'rgba(0,212,170,.5)', borderColor:'#00d4aa', borderWidth:1 },
-        { label:'Flat DCA 15%', data:[], type:'line', borderColor:'#0088ff', backgroundColor:'transparent', fill:false, tension:.4, pointRadius:3, pointBackgroundColor:'#0088ff', borderWidth:2, yAxisID:'y', borderDash:[4,3] }
+        { label:'Gains (Step-Up 10%)', data:[], backgroundColor:'rgba(0,212,170,.5)', borderColor:'#00d4aa', borderWidth:1 },
+        { label:'Flat DCA 10%', data:[], type:'line', borderColor:'#0088ff', backgroundColor:'transparent', fill:false, tension:.4, pointRadius:3, pointBackgroundColor:'#0088ff', borderWidth:2, yAxisID:'y', borderDash:[4,3] }
       ]
     },
     options:{
@@ -1123,17 +1323,818 @@ function initCharts() {
 // TAB SWITCH
 // ══════════════════════════════════════════════════
 function switchTab(name, btn) {
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
   btn.classList.add('active');
-  if (name==='model' && growthChart) setTimeout(()=>{ growthChart.resize(); },50);
-  if (name==='projections' && projChart) setTimeout(()=>{ projChart.resize(); },50);
+  if (name === 'model' && growthChart) setTimeout(() => { growthChart.resize(); }, 50);
+  if (name === 'projections' && projChart) setTimeout(() => { projChart.resize(); }, 50);
+  if (name === 'backtest' && backtestChart) setTimeout(() => { backtestChart.resize(); }, 50);
+}
+
+// ══════════════════════════════════════════════════
+// INVEST NOW CALCULATOR
+// ══════════════════════════════════════════════════
+const etfAcctMap = {
+  QQQ:  { acct:'TFSA',  reason:'Max growth tax-free' },
+  SCHG: { acct:'TFSA',  reason:'Growth, minimal dividends' },
+  VOO:  { acct:'TFSA',  reason:'Core anchor, shelter cap gains' },
+  VTI:  { acct:'TFSA',  reason:'Broad market, tax-free gains' },
+  VEA:  { acct:'TFSA',  reason:'International diversification' },
+  USMV: { acct:'TFSA',  reason:'Low-vol buffer' },
+  SOXX: { acct:'TFSA',  reason:'High growth, tax-free upside' },
+  SCHD: { acct:'RRSP',  reason:'US dividend treaty benefit' },
+  VYM:  { acct:'RRSP',  reason:'US dividend treaty benefit' },
+  JEPI: { acct:'RRSP',  reason:'7-8% yield, treaty saves most' }
+};
+
+function calcInvestNow() {
+  const startInput = document.getElementById('in-start-date').value;
+  const targetInput = document.getElementById('in-target-date').value;
+  const area = document.getElementById('in-result-area');
+  const indicator = document.getElementById('in-month-indicator');
+
+  if (!startInput || !targetInput) {
+    area.innerHTML = '';
+    indicator.innerHTML = '<span style="color:var(--accent3)">Pick both dates to calculate</span>';
+    return;
+  }
+
+  const startDate = new Date(startInput + 'T00:00:00');
+  const targetDate = new Date(targetInput + 'T00:00:00');
+
+  if (targetDate < startDate) {
+    area.innerHTML = '';
+    indicator.innerHTML = '<span style="color:var(--red)">Target date must be after start date</span>';
+    return;
+  }
+
+  // Calculate month number (1-based)
+  const diffMonths = (targetDate.getFullYear() - startDate.getFullYear()) * 12
+    + (targetDate.getMonth() - startDate.getMonth());
+  const monthNum = diffMonths + 1; // Month 1 = start month
+
+  // Determine year and phase
+  const yearNum = Math.ceil(monthNum / 12);
+  let phase, phaseIdx, phaseLabel;
+  if (yearNum <= 10) { phase = 'Accumulation'; phaseIdx = 0; phaseLabel = 'Phase 1 · Years 1-10'; }
+  else if (yearNum <= 20) { phase = 'Compounding'; phaseIdx = 1; phaseLabel = 'Phase 2 · Years 10-20'; }
+  else { phase = 'Harvest'; phaseIdx = 2; phaseLabel = 'Phase 3 · Years 20+'; }
+
+  indicator.innerHTML = `<span style="color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;">Month ${monthNum}</span> · Year ${yearNum} · ${phase}`;
+
+  // Past year 15 — no contributions
+  if (monthNum > CONTRIB_STOP_MONTHS) {
+    const lastContrib = Math.round(monthlyAtMonth(state.dca, state.stepUp, CONTRIB_STOP_MONTHS));
+    area.innerHTML = `<div class="in-past-yr15">
+      <strong>No Contributions After Year 15</strong>
+      <div style="font-size:11px;color:var(--text2);margin-top:8px;line-height:1.7;">
+        Month ${monthNum} (Year ${yearNum}) is past the 15-year contribution window.<br>
+        Your last monthly contribution was <span style="color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;">$${lastContrib.toLocaleString()}/mo</span> in Month 180.<br>
+        Portfolio is now compounding freely. No new money needed — just let it grow.<br>
+        ${yearNum >= 20 ? '<span style="color:var(--dividend)">You are in Harvest phase — SWR withdrawals may begin.</span>' : '<span style="color:var(--accent2)">Compounding phase — portfolio grows untouched until Year 20.</span>'}
+      </div>
+    </div>`;
+    return;
+  }
+
+  // Calculate exact contribution for this month
+  const monthlyAmt = Math.round(monthlyAtMonth(state.dca, state.stepUp, monthNum));
+
+  // Get phase allocations
+  const currentPhase = phaseAllocs[phaseIdx];
+
+  // Build per-ETF amounts
+  const etfBreakdown = currentPhase.rows.map(r => ({
+    etf: r.etf,
+    pct: r.pct,
+    amt: Math.round(monthlyAmt * r.pct / 100),
+    color: r.color,
+    acct: etfAcctMap[r.etf]?.acct || 'TFSA',
+    reason: etfAcctMap[r.etf]?.reason || ''
+  }));
+
+  // Build per-account aggregation
+  const acctTotals = {};
+  const acctEtfs = {};
+  etfBreakdown.forEach(e => {
+    if (!acctTotals[e.acct]) { acctTotals[e.acct] = 0; acctEtfs[e.acct] = []; }
+    acctTotals[e.acct] += e.amt;
+    acctEtfs[e.acct].push({ etf: e.etf, amt: e.amt });
+  });
+
+  // FHSA override: if eligible and in accumulation, cap FHSA at $667/mo and route growth ETFs there
+  const fhsaEligible = document.getElementById('fhsa-toggle').checked;
+  const acctOrder = [];
+  const acctDisplay = {};
+
+  if (fhsaEligible) {
+    const fhsaCap = Math.round(8000 / 12); // $667/mo
+    let fhsaUsed = 0;
+    const fhsaEtfs = [];
+    const tfsaEtfs = [];
+    const rrspEtfs = [];
+
+    // Priority: FHSA gets growth ETFs first (QQQ, VOO), up to cap
+    const fhsaPreferred = ['QQQ','VOO','SCHG','SOXX','VTI','VEA','USMV'];
+    const rrspPreferred = ['SCHD','VYM','JEPI'];
+
+    // RRSP ETFs go to RRSP
+    etfBreakdown.forEach(e => {
+      if (rrspPreferred.includes(e.etf)) {
+        rrspEtfs.push({ etf: e.etf, amt: e.amt });
+      }
+    });
+
+    // Remaining ETFs: fill FHSA up to cap, overflow to TFSA
+    etfBreakdown.forEach(e => {
+      if (rrspPreferred.includes(e.etf)) return;
+      if (fhsaUsed + e.amt <= fhsaCap) {
+        fhsaEtfs.push({ etf: e.etf, amt: e.amt });
+        fhsaUsed += e.amt;
+      } else if (fhsaUsed < fhsaCap) {
+        const toFhsa = fhsaCap - fhsaUsed;
+        const toTfsa = e.amt - toFhsa;
+        fhsaEtfs.push({ etf: e.etf, amt: toFhsa, note: '(partial)' });
+        tfsaEtfs.push({ etf: e.etf, amt: toTfsa, note: '(overflow)' });
+        fhsaUsed = fhsaCap;
+      } else {
+        tfsaEtfs.push({ etf: e.etf, amt: e.amt });
+      }
+    });
+
+    const fhsaTotal = fhsaEtfs.reduce((s,e) => s + e.amt, 0);
+    const tfsaTotal = tfsaEtfs.reduce((s,e) => s + e.amt, 0);
+    const rrspTotal = rrspEtfs.reduce((s,e) => s + e.amt, 0);
+
+    if (fhsaTotal > 0) { acctOrder.push('FHSA'); acctDisplay.FHSA = { total: fhsaTotal, etfs: fhsaEtfs, color: 'var(--fhsa)' }; }
+    if (tfsaTotal > 0) { acctOrder.push('TFSA'); acctDisplay.TFSA = { total: tfsaTotal, etfs: tfsaEtfs, color: 'var(--tfsa)' }; }
+    if (rrspTotal > 0) { acctOrder.push('RRSP'); acctDisplay.RRSP = { total: rrspTotal, etfs: rrspEtfs, color: 'var(--rrsp)' }; }
+  } else {
+    // No FHSA — TFSA for growth, RRSP for dividends
+    const tfsaEtfs = [];
+    const rrspEtfs = [];
+    const rrspPreferred = ['SCHD','VYM','JEPI'];
+    etfBreakdown.forEach(e => {
+      if (rrspPreferred.includes(e.etf)) rrspEtfs.push({ etf: e.etf, amt: e.amt });
+      else tfsaEtfs.push({ etf: e.etf, amt: e.amt });
+    });
+    const tfsaTotal = tfsaEtfs.reduce((s,e) => s + e.amt, 0);
+    const rrspTotal = rrspEtfs.reduce((s,e) => s + e.amt, 0);
+    if (tfsaTotal > 0) { acctOrder.push('TFSA'); acctDisplay.TFSA = { total: tfsaTotal, etfs: tfsaEtfs, color: 'var(--tfsa)' }; }
+    if (rrspTotal > 0) { acctOrder.push('RRSP'); acctDisplay.RRSP = { total: rrspTotal, etfs: rrspEtfs, color: 'var(--rrsp)' }; }
+  }
+
+  // Step-up context
+  const stepUpCount = Math.floor((monthNum - 1) / 4);
+  const nextStepUpMonth = monthNum <= 1 ? 5 : (Math.floor((monthNum - 1) / 4) + 1) * 4 + 1;
+  const nextStepUpInMonths = nextStepUpMonth > CONTRIB_STOP_MONTHS ? null : nextStepUpMonth - monthNum;
+  const nextAmt = nextStepUpMonth <= CONTRIB_STOP_MONTHS ? Math.round(monthlyAtMonth(state.dca, state.stepUp, nextStepUpMonth)) : null;
+
+  // Render
+  let html = `<div class="in-hero">
+    <div class="in-hero-card">
+      <div class="in-hero-label">This Month's Contribution</div>
+      <div class="in-hero-val" style="color:var(--accent)">$${monthlyAmt.toLocaleString()}</div>
+      <div class="in-hero-sub">Month ${monthNum} of 180</div>
+    </div>
+    <div class="in-hero-card">
+      <div class="in-hero-label">Current Phase</div>
+      <div class="in-hero-val" style="color:${currentPhase.color};font-size:16px;">${phase}</div>
+      <div class="in-hero-sub">${phaseLabel}</div>
+    </div>
+    <div class="in-hero-card">
+      <div class="in-hero-label">Step-Ups Applied</div>
+      <div class="in-hero-val" style="color:var(--accent2)">${stepUpCount}</div>
+      <div class="in-hero-sub">${nextStepUpInMonths != null && nextStepUpInMonths > 0 ? `Next in ${nextStepUpInMonths} mo → $${nextAmt.toLocaleString()}` : nextStepUpInMonths === 0 ? 'Step-up this month!' : 'Final step reached'}</div>
+    </div>
+    <div class="in-hero-card">
+      <div class="in-hero-label">Step-Up Rate</div>
+      <div class="in-hero-val" style="color:var(--accent3)">${state.stepUp}%</div>
+      <div class="in-hero-sub">every 4 months · from $${state.dca}</div>
+    </div>
+  </div>`;
+
+  // ETF breakdown + Account breakdown side by side
+  html += `<div class="in-breakdown">`;
+
+  // Left: ETF breakdown
+  html += `<div class="card"><div class="card-label">Per-ETF Breakdown · ${phase}</div><div class="in-etf-list" style="margin-top:8px;">`;
+  etfBreakdown.forEach(e => {
+    html += `<div class="in-etf-row">
+      <div><span class="in-etf-tick" style="color:${e.color}">${e.etf}</span> <span class="in-etf-pct">${e.pct}%</span></div>
+      <div class="in-etf-amt">$${e.amt.toLocaleString()}</div>
+    </div>`;
+  });
+  html += `<div style="display:flex;justify-content:space-between;padding:10px 12px;margin-top:4px;border-top:1px solid var(--border);font-size:10px;color:var(--text3);">
+    <span>Total</span><span style="color:var(--accent);font-family:'Syne',sans-serif;font-weight:800;font-size:14px;">$${monthlyAmt.toLocaleString()}</span>
+  </div></div></div>`;
+
+  // Right: Account breakdown
+  html += `<div class="card"><div class="card-label">Where to Put It · Account Routing</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">`;
+  acctOrder.forEach(acctName => {
+    const a = acctDisplay[acctName];
+    html += `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px;border-left:3px solid ${a.color};">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span class="in-acct-name" style="color:${a.color}">${acctName}</span>
+        <span class="in-acct-amt" style="color:${a.color}">$${a.total.toLocaleString()}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;">`;
+    a.etfs.forEach(e => {
+      const note = e.note ? ` <span style="color:var(--text3);font-size:8px;">${e.note}</span>` : '';
+      html += `<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text2);padding:2px 0;">
+        <span>${e.etf}${note}</span><span style="color:var(--text)">$${e.amt.toLocaleString()}</span>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  // FHSA toggle note
+  html += `<div style="font-size:9px;color:var(--text3);margin-top:4px;line-height:1.6;">
+    Account routing uses ${fhsaEligible ? 'FHSA→TFSA→RRSP' : 'TFSA→RRSP'} priority. ${fhsaEligible ? 'FHSA capped at $667/mo ($8K/yr).' : 'Toggle FHSA in Account Guide tab if eligible.'}
+    Dividend ETFs (SCHD, VYM, JEPI) always route to RRSP for US withholding treaty.
+  </div>`;
+
+  html += `</div></div></div>`;
+
+  // Quick action summary
+  html += `<div class="card" style="margin-top:14px;">
+    <div class="card-label">Quick Action Summary</div>
+    <div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.8;">`;
+  acctOrder.forEach(acctName => {
+    const a = acctDisplay[acctName];
+    const etfList = a.etfs.map(e => `${e.etf} $${e.amt}`).join(' · ');
+    html += `<div style="margin-bottom:4px;"><span style="color:${a.color};font-family:'Syne',sans-serif;font-weight:700;">${acctName}</span> → Deposit <span style="color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;">$${a.total.toLocaleString()}</span> → Buy: ${etfList}</div>`;
+  });
+  html += `<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);color:var(--text3);font-size:10px;">
+    Total this month: <strong style="color:var(--accent)">$${monthlyAmt.toLocaleString()}</strong> across ${acctOrder.length} account${acctOrder.length > 1 ? 's' : ''}.
+    All ETFs are commission-free on Wealthsimple. Buy in USD account ($10/mo).
+  </div></div></div>`;
+
+  area.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════
+// ACTUAL RETURNS — REAL HISTORICAL BACKTEST
+// ══════════════════════════════════════════════════
+const priceCache = {};
+let backtestChart = null;
+
+// ETF inception dates (approx) — skip months before ETF existed
+const etfInception = {
+  QQQ:'1999-03', SCHG:'2009-12', VOO:'2010-09', VTI:'2001-05',
+  VEA:'2007-07', USMV:'2011-10', SOXX:'2001-07',
+  SCHD:'2011-10', VYM:'2006-11', JEPI:'2020-05'
+};
+
+// Twelve Data API key management
+function saveTDKey() {
+  const keyInput = document.getElementById('bt-api-key');
+  const status = document.getElementById('bt-key-status');
+  const k = (keyInput.value || '').trim();
+  if (!k) { status.innerHTML = '<span style="color:var(--red)">Enter an API key first</span>'; return; }
+  localStorage.setItem('etf_v2_td_apikey', k);
+  status.innerHTML = '<span style="color:var(--accent)">API key saved! You can now run backtests.</span>';
+}
+
+function loadTDKey() {
+  const k = localStorage.getItem('etf_v2_td_apikey') || '';
+  const keyInput = document.getElementById('bt-api-key');
+  const status = document.getElementById('bt-key-status');
+  if (keyInput && k) {
+    keyInput.value = k;
+    status.innerHTML = '<span style="color:var(--accent)">Key loaded from saved settings</span>';
+  }
+}
+
+// Fetch from Twelve Data API (CORS-friendly, free tier)
+// adjust=all returns prices adjusted for BOTH dividends AND stock splits (matches Yahoo Finance adjusted close)
+async function fetchFromTwelveData(ticker, apiKey) {
+  const url = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=1month&outputsize=5000&adjust=all&apikey=${apiKey}`;
+  const r = await fetch(url, { signal: AbortSignal.timeout(15000) });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const data = await r.json();
+  if (data.status === 'error') throw new Error(data.message || 'API error');
+  if (!data.values || data.values.length === 0) throw new Error('No data returned');
+
+  const monthMap = {};
+  data.values.forEach(v => {
+    const price = parseFloat(v.close);
+    if (price > 0) {
+      const ym = v.datetime.substring(0, 7); // "2024-09"
+      monthMap[ym] = price;
+    }
+  });
+
+  const monthly = Object.entries(monthMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([ym, price]) => ({ ym, price }));
+
+  // Latest price = most recent data point
+  const sorted = [...monthly].sort((a, b) => b.ym.localeCompare(a.ym));
+  const currentPrice = sorted.length > 0 ? sorted[0].price : 0;
+
+  return { monthly, currentPrice, ticker, source: 'Twelve Data (adjusted)', fetchedAt: new Date().toISOString() };
+}
+
+// Auto-purge old unadjusted cache on first load
+(function purgeStaleCacheOnLoad() {
+  try {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith('etf_v2_') && !k.startsWith('etf_v2adj_') && k !== 'etf_v2_td_apikey') keys.push(k);
+    }
+    if (keys.length > 0) {
+      keys.forEach(k => localStorage.removeItem(k));
+      console.log(`[ETF Model] Purged ${keys.length} stale unadjusted price cache entries`);
+    }
+  } catch(e) {}
+})();
+
+async function fetchMonthlyPrices(ticker, startUnix, endUnix) {
+  const key = `${ticker}|${startUnix}|${endUnix}`;
+  if (priceCache[key]) return priceCache[key];
+
+  // Check localStorage cache (4-hour TTL) — uses v2adj_ prefix for adjusted prices
+  const cacheKey = `etf_v2adj_${ticker}`;
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const { ts, data } = JSON.parse(cached);
+      if (Date.now() - ts < 4 * 60 * 60 * 1000) {
+        priceCache[key] = data;
+        return data;
+      }
+    }
+  } catch(e) {}
+
+  // Strategy 1: Twelve Data API (reliable, CORS-friendly, adjust=all for dividend+split adjusted)
+  const apiKey = localStorage.getItem('etf_v2_td_apikey') || '';
+  if (apiKey) {
+    try {
+      const parsed = await fetchFromTwelveData(ticker, apiKey);
+      try { localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: parsed })); } catch(e) {}
+      priceCache[key] = parsed;
+      return parsed;
+    } catch(e) {
+      console.warn(`Twelve Data failed for ${ticker}: ${e.message}`);
+    }
+  }
+
+  // Strategy 2: Yahoo Finance via CORS proxies (fallback)
+  const yahooUrl = `https://query2.finance.yahoo.com/v8/finance/chart/${ticker}?period1=${startUnix}&period2=${endUnix}&interval=1mo&includeAdjustedClose=true`;
+
+  const proxies = [
+    { name: 'AllOrigins', fn: async () => {
+      const r = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(yahooUrl)}`, { signal: AbortSignal.timeout(15000) });
+      if (!r.ok) throw new Error(r.status);
+      const w = await r.json();
+      return JSON.parse(w.contents);
+    }},
+    { name: 'CORSProxy', fn: async () => {
+      const r = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(yahooUrl)}`, { signal: AbortSignal.timeout(15000) });
+      if (!r.ok) throw new Error(r.status);
+      return await r.json();
+    }},
+    { name: 'AllOrigins Raw', fn: async () => {
+      const r = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`, { signal: AbortSignal.timeout(15000) });
+      if (!r.ok) throw new Error(r.status);
+      return await r.json();
+    }},
+  ];
+
+  let data = null;
+  let sourceUsed = 'Unknown';
+  for (const { name, fn } of proxies) {
+    try {
+      data = await fn();
+      if (data?.chart?.result?.[0]) { sourceUsed = name; break; }
+      data = null;
+    } catch(e) { data = null; continue; }
+  }
+
+  if (!data?.chart?.result?.[0]) {
+    if (!apiKey) throw new Error(`No data for ${ticker} — add your free Twelve Data API key above to enable live prices`);
+    throw new Error(`No data for ${ticker} — all sources failed`);
+  }
+
+  const result = data.chart.result[0];
+  const timestamps = result.timestamp || [];
+  const adjCloses = result.indicators?.adjclose?.[0]?.adjclose
+    || result.indicators?.quote?.[0]?.close || [];
+  const currentPrice = result.meta?.regularMarketPrice || adjCloses[adjCloses.length - 1] || 0;
+
+  // Deduplicate by month (JEPI sometimes returns weekly data)
+  const monthMap = {};
+  for (let i = 0; i < timestamps.length; i++) {
+    if (adjCloses[i] != null && adjCloses[i] > 0) {
+      const d = new Date(timestamps[i] * 1000);
+      const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      monthMap[ym] = adjCloses[i];
+    }
+  }
+
+  const monthly = Object.entries(monthMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([ym, price]) => ({ ym, price }));
+
+  const parsed = { monthly, currentPrice, ticker, source: sourceUsed, fetchedAt: new Date().toISOString() };
+
+  // Cache in localStorage (survives page reloads)
+  try { localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: parsed })); } catch(e) {}
+
+  priceCache[key] = parsed;
+  return parsed;
+}
+
+function clearPriceCache() {
+  const keys = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    // Clear both old (etf_v2_) and new (etf_v2adj_) cache keys, but keep API key
+    if (k && (k.startsWith('etf_v2_') || k.startsWith('etf_v2adj_')) && k !== 'etf_v2_td_apikey') keys.push(k);
+  }
+  keys.forEach(k => localStorage.removeItem(k));
+  Object.keys(priceCache).forEach(k => delete priceCache[k]);
+  document.getElementById('bt-status').innerHTML = '<span style="color:var(--accent)">Cache cleared — run backtest again</span>';
+}
+
+function setBTQuick(years) {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - years);
+  d.setDate(1);
+  document.getElementById('bt-start-date').value = d.toISOString().split('T')[0];
+  runBacktest();
+}
+
+async function runBacktest() {
+  const startVal = document.getElementById('bt-start-date').value;
+  const area = document.getElementById('bt-result-area');
+  const statusEl = document.getElementById('bt-status');
+
+  if (!startVal) {
+    statusEl.innerHTML = '<span style="color:var(--accent3)">Pick a start date first</span>';
+    return;
+  }
+
+  const startDate = new Date(startVal + 'T00:00:00');
+  const now = new Date();
+  if (startDate >= now) {
+    statusEl.innerHTML = '<span style="color:var(--red)">Start date must be in the past</span>';
+    return;
+  }
+
+  // Show loading
+  statusEl.textContent = '';
+  const hasKey = !!(localStorage.getItem('etf_v2_td_apikey') || '').trim();
+  area.innerHTML = `<div class="bt-loading"><div class="bt-spinner"></div><div>Fetching live price data for 10 ETFs...</div><div style="font-size:10px;margin-top:6px;">${hasKey ? 'Source: Twelve Data API (dividend+split adjusted)' : 'Trying CORS proxies (add API key for reliable access)'} · cached data loads instantly</div></div>`;
+
+  const startUnix = Math.floor(startDate.getTime() / 1000);
+  const endUnix = Math.floor(now.getTime() / 1000);
+  const totalCalendarMonths = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth());
+  const contribMonths = Math.min(totalCalendarMonths, CONTRIB_STOP_MONTHS);
+
+  // Determine which ETFs we need across all active phases
+  const activeETFs = new Set();
+  for (let m = 1; m <= contribMonths; m++) {
+    const yr = Math.ceil(m / 12);
+    const pi = yr <= 10 ? 0 : yr <= 20 ? 1 : 2;
+    phaseAllocs[pi].rows.forEach(r => activeETFs.add(r.etf));
+  }
+
+  // Fetch all ETF prices in parallel
+  const tickers = [...activeETFs];
+  let fetchedCount = 0;
+  const updateStatus = () => { statusEl.textContent = `Fetched ${fetchedCount}/${tickers.length} ETFs...`; };
+
+  try {
+    // Stagger requests to avoid rate limits (Twelve Data: 8 req/min)
+    const apiKey = localStorage.getItem('etf_v2_td_apikey') || '';
+    const useStagger = !!apiKey.trim();
+    const results = [];
+    if (useStagger) {
+      for (const t of tickers) {
+        try {
+          const res = await fetchMonthlyPrices(t, startUnix, endUnix);
+          results.push({ status: 'fulfilled', value: res });
+        } catch(e) {
+          results.push({ status: 'rejected', reason: e });
+        }
+        fetchedCount++;
+        updateStatus();
+      }
+    } else {
+      const settled = await Promise.allSettled(
+        tickers.map(async t => {
+          const res = await fetchMonthlyPrices(t, startUnix, endUnix);
+          fetchedCount++;
+          updateStatus();
+          return res;
+        })
+      );
+      results.push(...settled);
+    }
+
+    const prices = {};
+    const failed = [];
+    tickers.forEach((t, i) => {
+      if (results[i].status === 'fulfilled') prices[t] = results[i].value;
+      else failed.push(t);
+    });
+
+    if (Object.keys(prices).length === 0) {
+      const hasKey = !!(localStorage.getItem('etf_v2_td_apikey') || '').trim();
+      area.innerHTML = `<div class="bt-error"><strong>Could not fetch price data.</strong><br><br>${
+        hasKey
+          ? 'Your API key may be invalid or rate-limited. Check your key at <a href="https://twelvedata.com/account" target="_blank" style="color:var(--accent2)">twelvedata.com/account</a>.<br>Free tier: 800 req/day, 8 req/min.'
+          : '<strong style="color:var(--accent)">Add your free API key above to enable live prices.</strong><br>Go to <a href="https://twelvedata.com/pricing" target="_blank" style="color:var(--accent2)">twelvedata.com</a> → Sign up free → Copy API key → Paste above.'
+      }<br><br><button onclick="clearPriceCache()" style="background:var(--accent);color:#080c10;border:none;padding:6px 14px;border-radius:3px;cursor:pointer;font-size:10px;">Clear Cache & Retry</button></div>`;
+      statusEl.textContent = '';
+      return;
+    }
+
+    // Build a YM lookup for each ETF
+    const priceLookup = {};
+    Object.keys(prices).forEach(t => {
+      priceLookup[t] = {};
+      prices[t].monthly.forEach(m => { priceLookup[t][m.ym] = m.price; });
+    });
+
+    // Simulate month-by-month DCA
+    const portfolio = {};
+    tickers.forEach(t => { portfolio[t] = { shares: 0, invested: 0 }; });
+    let totalInvested = 0;
+    const snapshots = [];
+
+    for (let m = 1; m <= contribMonths; m++) {
+      const mDate = new Date(startDate);
+      mDate.setMonth(mDate.getMonth() + m - 1);
+      const ym = `${mDate.getFullYear()}-${String(mDate.getMonth()+1).padStart(2,'0')}`;
+      const dcaAmt = monthlyAtMonth(state.dca, state.stepUp, m);
+      const yr = Math.ceil(m / 12);
+      const pi = yr <= 10 ? 0 : yr <= 20 ? 1 : 2;
+      const phase = phaseAllocs[pi];
+
+      // Allocate per ETF
+      let monthInvested = 0;
+      phase.rows.forEach(r => {
+        const alloc = dcaAmt * r.pct / 100;
+        if (!priceLookup[r.etf]) return;
+
+        // Check ETF inception
+        const inception = etfInception[r.etf];
+        if (inception && ym < inception) {
+          // Redirect to VOO if ETF doesn't exist yet
+          if (priceLookup['VOO'] && priceLookup['VOO'][ym]) {
+            const p = priceLookup['VOO'][ym];
+            portfolio['VOO'].shares += alloc / p;
+            portfolio['VOO'].invested += alloc;
+          }
+          totalInvested += alloc;
+          monthInvested += alloc;
+          return;
+        }
+
+        // Find price: exact month, or closest prior month
+        let price = priceLookup[r.etf][ym];
+        if (!price) {
+          const sortedYMs = Object.keys(priceLookup[r.etf]).sort();
+          for (let i = sortedYMs.length - 1; i >= 0; i--) {
+            if (sortedYMs[i] <= ym) { price = priceLookup[r.etf][sortedYMs[i]]; break; }
+          }
+        }
+
+        if (price && price > 0) {
+          portfolio[r.etf].shares += alloc / price;
+          portfolio[r.etf].invested += alloc;
+          totalInvested += alloc;
+          monthInvested += alloc;
+        }
+      });
+
+      // Snapshot: portfolio value at this month
+      let snapVal = 0;
+      Object.keys(portfolio).forEach(t => {
+        if (portfolio[t].shares <= 0 || !priceLookup[t]) return;
+        let p = priceLookup[t][ym];
+        if (!p) {
+          const sorted = Object.keys(priceLookup[t]).sort();
+          for (let i = sorted.length - 1; i >= 0; i--) {
+            if (sorted[i] <= ym) { p = priceLookup[t][sorted[i]]; break; }
+          }
+        }
+        if (p) snapVal += portfolio[t].shares * p;
+      });
+
+      snapshots.push({ month: m, ym, invested: totalInvested, value: snapVal });
+    }
+
+    // Current portfolio value using latest prices
+    let currentValue = 0;
+    const etfResults = [];
+    Object.keys(portfolio).forEach(t => {
+      if (portfolio[t].shares <= 0) return;
+      const cp = prices[t]?.currentPrice || 0;
+      if (!cp) return;
+      const val = portfolio[t].shares * cp;
+      currentValue += val;
+      const gain = val - portfolio[t].invested;
+      const gainPct = portfolio[t].invested > 0 ? (gain / portfolio[t].invested * 100) : 0;
+      etfResults.push({
+        ticker: t, shares: portfolio[t].shares, invested: portfolio[t].invested,
+        currentPrice: cp, value: val, gain, gainPct,
+        color: etfColors[t] || '#8ab0a0'
+      });
+    });
+    etfResults.sort((a, b) => b.value - a.value);
+
+    // Add final snapshot with current prices
+    snapshots.push({ month: contribMonths + 1, ym: 'now', invested: totalInvested, value: currentValue });
+
+    renderBacktest({ startDate, now, contribMonths, totalCalendarMonths, totalInvested, currentValue, etfResults, snapshots, failed, prices });
+    const srcSet = [...new Set(Object.values(prices).map(p => p.source).filter(Boolean))];
+    statusEl.innerHTML = `<span style="color:var(--accent)">Backtest complete · ${Object.keys(prices).length} ETFs loaded via ${srcSet.join(', ') || 'cache'}</span>`;
+
+  } catch(e) {
+    area.innerHTML = `<div class="bt-error"><strong>Backtest Error:</strong> ${e.message}</div>`;
+    statusEl.textContent = '';
+  }
+}
+
+function renderBacktest({ startDate, now, contribMonths, totalCalendarMonths, totalInvested, currentValue, etfResults, snapshots, failed, prices }) {
+  const area = document.getElementById('bt-result-area');
+  const totalGain = currentValue - totalInvested;
+  const totalGainPct = totalInvested > 0 ? (totalGain / totalInvested * 100) : 0;
+  const multiple = totalInvested > 0 ? (currentValue / totalInvested) : 0;
+  const years = totalCalendarMonths / 12;
+  const cagr = totalInvested > 0 && years > 0 ? ((Math.pow(currentValue / totalInvested, 1 / years) - 1) * 100) : 0;
+  const isPositive = totalGain >= 0;
+  const gainColor = isPositive ? 'var(--accent)' : 'var(--red)';
+  const sign = isPositive ? '+' : '';
+
+  // Model projected value for comparison
+  const modelProjected = calcStepUpFV(state.dca, state.stepUp, state.targetReturn + marketMod[state.market], Math.ceil(totalCalendarMonths / 12));
+
+  let html = '';
+
+  // Hero stats
+  html += `<div class="bt-hero">
+    <div class="bt-hero-card">
+      <div class="bt-hero-label">Actual Portfolio Value</div>
+      <div class="bt-hero-val" style="color:${gainColor}">${fmt(currentValue)}</div>
+      <div class="bt-hero-sub">as of today · real prices</div>
+    </div>
+    <div class="bt-hero-card">
+      <div class="bt-hero-label">Total Invested</div>
+      <div class="bt-hero-val" style="color:var(--accent2)">${fmt(totalInvested)}</div>
+      <div class="bt-hero-sub">${contribMonths} months of DCA</div>
+    </div>
+    <div class="bt-hero-card">
+      <div class="bt-hero-label">Total Return</div>
+      <div class="bt-hero-val" style="color:${gainColor}">${sign}${fmt(totalGain)}</div>
+      <div class="bt-hero-sub">${sign}${totalGainPct.toFixed(1)}%</div>
+    </div>
+    <div class="bt-hero-card">
+      <div class="bt-hero-label">Return Multiple</div>
+      <div class="bt-hero-val" style="color:${gainColor}">${multiple.toFixed(2)}x</div>
+      <div class="bt-hero-sub">CAGR: ${sign}${cagr.toFixed(1)}%</div>
+    </div>
+    <div class="bt-hero-card">
+      <div class="bt-hero-label">Model Projected</div>
+      <div class="bt-hero-val" style="color:var(--text2)">${fmt(modelProjected.value)}</div>
+      <div class="bt-hero-sub">at ${state.targetReturn}% · ${Math.ceil(totalCalendarMonths/12)} yrs</div>
+    </div>
+  </div>`;
+
+  // Accuracy badge
+  const accuracy = modelProjected.value > 0 ? ((currentValue / modelProjected.value) * 100).toFixed(0) : '--';
+  const accColor = accuracy >= 90 && accuracy <= 110 ? 'var(--accent)' : accuracy > 110 ? 'var(--accent4)' : 'var(--accent3)';
+  html += `<div class="card" style="margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+    <div><span style="font-family:'Syne',sans-serif;font-weight:700;font-size:11px;color:var(--text);">Model Accuracy:</span></div>
+    <div style="background:${accColor}22;border:1px solid ${accColor}44;border-radius:4px;padding:4px 12px;">
+      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:${accColor}">${accuracy}%</span>
+      <span style="font-size:9px;color:var(--text3);margin-left:4px;">actual vs model</span>
+    </div>
+    <div style="font-size:10px;color:var(--text3);line-height:1.5;">
+      ${Number(accuracy) > 110 ? 'Real returns BEAT the model — market outperformed projections.' : Number(accuracy) >= 90 ? 'Model tracked real returns closely. Projections are reliable at this horizon.' : 'Model overprojected — shorter horizons and bear markets reduce accuracy.'}
+    </div>
+  </div>`;
+
+  // Growth chart
+  html += `<div class="card" style="margin-bottom:16px;">
+    <div class="card-label">Portfolio Growth · Real Historical Data</div>
+    <div class="chart-wrap" style="height:260px;"><canvas id="backtestChart"></canvas></div>
+  </div>`;
+
+  // Per-ETF cards
+  html += `<div class="card" style="margin-bottom:16px;">
+    <div class="card-label">Per-ETF Performance · Real Returns Since ${startDate.toLocaleDateString('en-CA')}</div>
+    <div class="bt-etf-grid">`;
+
+  etfResults.forEach(e => {
+    const isPos = e.gain >= 0;
+    const gc = isPos ? 'var(--accent)' : 'var(--red)';
+    const s = isPos ? '+' : '';
+    html += `<div class="bt-etf-card" style="border-top:2px solid ${e.color};">
+      <div class="bt-etf-header">
+        <span class="bt-etf-ticker" style="color:${e.color}">${e.ticker}</span>
+        <span class="bt-etf-gain" style="color:${gc}">${s}${e.gainPct.toFixed(1)}%</span>
+      </div>
+      <div class="bt-etf-stat"><span>Invested</span><span class="bt-etf-stat-val">${fmt(e.invested)}</span></div>
+      <div class="bt-etf-stat"><span>Current Value</span><span class="bt-etf-stat-val" style="color:${gc}">${fmt(e.value)}</span></div>
+      <div class="bt-etf-stat"><span>Gain/Loss</span><span class="bt-etf-stat-val" style="color:${gc}">${s}${fmt(e.gain)}</span></div>
+      <div class="bt-etf-stat"><span>Shares</span><span class="bt-etf-stat-val">${e.shares.toFixed(4)}</span></div>
+      <div class="bt-etf-stat"><span>Price Now</span><span class="bt-etf-stat-val">$${e.currentPrice.toFixed(2)}</span></div>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  // Winners/losers summary
+  if (etfResults.length > 1) {
+    const best = etfResults.reduce((a, b) => a.gainPct > b.gainPct ? a : b);
+    const worst = etfResults.reduce((a, b) => a.gainPct < b.gainPct ? a : b);
+    html += `<div class="card" style="margin-bottom:16px;">
+      <div class="card-label">Performance Summary</div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;">
+        <div style="flex:1;min-width:200px;padding:12px;background:rgba(0,212,170,.05);border:1px solid rgba(0,212,170,.15);border-radius:6px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:4px;">Best Performer</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:var(--accent)">${best.ticker} +${best.gainPct.toFixed(1)}%</div>
+          <div style="font-size:10px;color:var(--text2);">${fmt(best.invested)} → ${fmt(best.value)}</div>
+        </div>
+        <div style="flex:1;min-width:200px;padding:12px;background:rgba(255,68,85,.05);border:1px solid rgba(255,68,85,.15);border-radius:6px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text3);margin-bottom:4px;">Weakest Performer</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:${worst.gainPct >= 0 ? 'var(--accent)' : 'var(--red)'}">${worst.ticker} ${worst.gainPct >= 0 ? '+' : ''}${worst.gainPct.toFixed(1)}%</div>
+          <div style="font-size:10px;color:var(--text2);">${fmt(worst.invested)} → ${fmt(worst.value)}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Failed ETFs note
+  if (failed.length > 0) {
+    html += `<div class="bt-note" style="color:var(--accent3);">Could not fetch data for: ${failed.join(', ')}. These ETFs are excluded from the backtest.</div>`;
+  }
+
+  // Data source info
+  const sources = [...new Set(etfResults.map(e => prices[e.ticker]?.source).filter(Boolean))];
+  const fetchTimes = etfResults.map(e => prices[e.ticker]?.fetchedAt).filter(Boolean).sort();
+  const latestFetch = fetchTimes.length > 0 ? new Date(fetchTimes[fetchTimes.length - 1]).toLocaleString() : 'unknown';
+  html += `<div class="bt-note">
+    <strong>Live Data</strong> via Yahoo Finance (adjusted close prices — includes dividends & splits).<br>
+    Source: ${sources.join(', ') || 'Yahoo Finance'} · Fetched: ${latestFetch} · Cached for 4 hours<br>
+    <button onclick="clearPriceCache()" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border);padding:3px 10px;border-radius:3px;cursor:pointer;font-size:9px;margin-top:4px;">Clear Cache & Refresh</button><br>
+    Backtest assumes buying at each month's closing price. All 10 ETFs trade commission-free on Wealthsimple. Past performance does not guarantee future results.
+  </div>`;
+
+  area.innerHTML = html;
+
+  // Build backtest chart
+  const ctx = document.getElementById('backtestChart');
+  if (ctx) {
+    if (backtestChart) backtestChart.destroy();
+    const labels = snapshots.map(s => s.ym === 'now' ? 'Now' : s.ym);
+    // Thin out labels for readability
+    const step = Math.max(1, Math.floor(snapshots.length / 24));
+    const displayLabels = labels.map((l, i) => (i % step === 0 || i === labels.length - 1) ? l : '');
+
+    backtestChart = new Chart(ctx.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: displayLabels,
+        datasets: [
+          { label: 'Portfolio Value (Real)', data: snapshots.map(s => s.value), borderColor: '#00d4aa', backgroundColor: 'rgba(0,212,170,.08)', fill: true, tension: .4, pointRadius: 0, borderWidth: 2 },
+          { label: 'Total Invested', data: snapshots.map(s => s.invested), borderColor: '#243545', backgroundColor: 'transparent', fill: false, tension: 0, pointRadius: 0, borderWidth: 1.5, borderDash: [4, 3] }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: { duration: 600 },
+        plugins: {
+          legend: { labels: { color: '#8ab0a0', font: { family: 'JetBrains Mono', size: 9 }, boxWidth: 14 } },
+          tooltip: {
+            backgroundColor: '#0d1318', borderColor: '#1e2d3a', borderWidth: 1,
+            titleColor: '#e8f4f0', bodyColor: '#8ab0a0',
+            titleFont: { family: 'Syne', size: 11, weight: '700' },
+            bodyFont: { family: 'JetBrains Mono', size: 10 },
+            callbacks: { label: c => ' ' + fmt(c.raw) }
+          }
+        },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,.03)' }, ticks: { color: '#4a7060', font: { family: 'JetBrains Mono', size: 9 }, maxRotation: 45 } },
+          y: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { color: '#4a7060', font: { family: 'JetBrains Mono', size: 9 }, callback: v => fmt(v) } }
+        }
+      }
+    });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   initCharts();
   updateModel();
+  loadTDKey();
+  // Default invest-now dates
+  const today = new Date();
+  document.getElementById('in-target-date').value = today.toISOString().split('T')[0];
 });
 </script>
 </body>
